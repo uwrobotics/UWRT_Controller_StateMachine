@@ -23,7 +23,7 @@ add_executable(my_publisher_node src/my_publisher_node.cpp)
 ament_target_dependencies(my_publisher_node rclcpp geometry_msgs)
 
 # Ensure generated messages are built before the node
-add_dependencies(${PROJECT_NAME}_generate_interfaces)
+add_dependencies(${PROJECT_NAME} ${PROJECT_NAME}_generate_interfaces)
 
 # Install the node executable
 install(TARGETS
