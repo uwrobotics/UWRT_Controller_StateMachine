@@ -32,6 +32,10 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME}
 )
 
+rosidl_get_typesupport_target(cpp_typesupport_target
+  ${PROJECT_NAME} rosidl_typesupport_cpp)
+
+target_link_libraries(${PROJECT_NAME} "${cpp_typesupport_target}")
 # Export package dependencies
 ament_export_dependencies(rosidl_default_runtime)
 
