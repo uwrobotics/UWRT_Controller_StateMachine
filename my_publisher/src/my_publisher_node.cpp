@@ -1,5 +1,5 @@
 #include "rclcpp/rclcpp.hpp"
-#include "my_publisher/msg/my_custom_msg.hpp"
+#include "msg/my_custom_msg.hpp"
 #include "geometry_msgs/msg/pose.hpp"
 
 class MyPublisher : public rclcpp::Node
