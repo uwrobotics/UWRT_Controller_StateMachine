@@ -28,7 +28,7 @@ public:
   }
 
 private:
-  rclcpp::Publisher<controller_statemachine::msg::AddressBook>::SharedPtr cmd_vel_publisher_;
+  rclcpp::Publisher<controller_statemachine::msg::CmdVel>::SharedPtr cmd_vel_publisher_;
   rclcpp::TimerBase::SharedPtr timer_;
 };
 
