@@ -10,7 +10,6 @@ find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
-find_package(rosidl_default_generators REQUIRED)
 
 ament_export_dependencies(rosidl_default_runtime)
 
@@ -23,9 +22,6 @@ ament_target_dependencies(publish_vel rclcpp)
 install(TARGETS
   publish_vel
   DESTINATION lib/${PROJECT_NAME})
-
-rosidl_get_typesupport_target(cpp_typesupport_target
-  ${PROJECT_NAME} rosidl_typesupport_cpp)
 
 target_link_libraries(publish_vel "${cpp_typesupport_target}")
 
