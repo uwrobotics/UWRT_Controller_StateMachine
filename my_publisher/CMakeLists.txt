@@ -30,8 +30,6 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME}
 )
 
-ament_package()
-
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
