@@ -22,7 +22,7 @@ public:
         message.cmd = "Vel";
         message.speed = 10;
 
-        this->cmd_vel_publisher->publish(message);
+        this->cmd_vel_publisher_->publish(message);
       };
     timer_ = this->create_wall_timer(1s, publish_msg);
   }
