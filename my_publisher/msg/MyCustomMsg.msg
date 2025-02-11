@@ -1,2 +1,0 @@
-int32 my_integer
-geometry_msgs/Pose my_pose
