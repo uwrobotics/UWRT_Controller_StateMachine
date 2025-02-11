@@ -5,10 +5,6 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-set(msg_files
-  "msg/CmdVel.msg"
-)
-
 # find dependencies
 find_package(ament_cmake REQUIRED)
 # uncomment the following section in order to fill in
@@ -23,6 +19,7 @@ rosidl_generate_interfaces(${PROJECT_NAME}
 ament_export_dependencies(rosidl_default_runtime)
 
 find_package(rclcpp REQUIRED)
+add_dependencies(tutorial_interfaces ${catkin_EXPORTED_TARGETS})
 
 add_executable(publish_vel src/publish_vel.cpp)
 ament_target_dependencies(publish_vel rclcpp)
