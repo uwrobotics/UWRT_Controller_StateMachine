@@ -16,7 +16,7 @@ find_package(rclcpp REQUIRED)
 find_package(tutorial_interfaces REQUIRED)                      # CHANGE
 
 add_executable(publish_vel src/publish_vel.cpp)
-ament_target_dependencies(talker rclcpp tutorial_interfaces)    # CHANGE
+ament_target_dependencies(publish_vel rclcpp tutorial_interfaces)    # CHANGE
 
 install(TARGETS
   publish_vel
