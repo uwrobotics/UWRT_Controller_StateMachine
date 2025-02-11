@@ -12,11 +12,11 @@ public:
   CmdVelPublisher()
   : Node("cmd_vel_publisher")
   {
-    address_book_publisher_ =
+    cmd_vel_publisher_ =
       this->create_publisher<controller_statemachine::msg::CmdVel>("cmd_vel", 10);
 
     auto publish_msg = [this]() -> void {
-        auto message = more_interfaces::msg::CmdVel();
+        auto message = controller_statemachine::msg::CmdVel();
 
         message.axis_id = 1;
         message.cmd = "Vel";
@@ -28,7 +28,7 @@ public:
   }
 
 private:
-  rclcpp::Publisher<more_interfaces::msg::AddressBook>::SharedPtr cmd_vel_publisher_;
+  rclcpp::Publisher<controller_statemachine::msg::AddressBook>::SharedPtr cmd_vel_publisher_;
   rclcpp::TimerBase::SharedPtr timer_;
 };
 
