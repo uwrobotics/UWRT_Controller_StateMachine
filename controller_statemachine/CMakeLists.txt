@@ -11,19 +11,18 @@ find_package(ament_cmake REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
-ament_export_dependencies(rosidl_default_runtime)
-
+find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
-add_dependencies(tutorial_interfaces ${catkin_EXPORTED_TARGETS})
+find_package(tutorial_interfaces REQUIRED)                      # CHANGE
 
 add_executable(publish_vel src/publish_vel.cpp)
-ament_target_dependencies(publish_vel rclcpp)
+ament_target_dependencies(talker rclcpp tutorial_interfaces)    # CHANGE
 
 install(TARGETS
   publish_vel
   DESTINATION lib/${PROJECT_NAME})
 
-target_link_libraries(publish_vel "${cpp_typesupport_target}")
+ament_package()
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
