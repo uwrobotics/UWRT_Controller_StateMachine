@@ -2,7 +2,7 @@
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
-#include "controller_statemachine/msg/CmdVel.hpp"
+#include "controller_statemachine/msg/cmd_vel.hpp"
 
 using namespace std::chrono_literals;
 
