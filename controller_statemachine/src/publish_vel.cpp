@@ -13,10 +13,10 @@ public:
   : Node("cmd_vel_publisher")
   {
     cmd_vel_publisher_ =
-      this->create_publisher<controller_statemachine::msg::CmdVel>("cmd_vel", 10);
+      this->create_publisher<tutorial_interfaces::msg::CmdVel>("cmd_vel", 10);
 
     auto publish_msg = [this]() -> void {
-        auto message = controller_statemachine::msg::CmdVel();
+        auto message = tutorial_interfaces::msg::CmdVel();
 
         message.axis_id = 1;
         message.cmd = "Vel";
@@ -28,7 +28,7 @@ public:
   }
 
 private:
-  rclcpp::Publisher<controller_statemachine::msg::CmdVel>::SharedPtr cmd_vel_publisher_;
+  rclcpp::Publisher<tutorial_interfaces::msg::CmdVel>::SharedPtr cmd_vel_publisher_;
   rclcpp::TimerBase::SharedPtr timer_;
 };
 
