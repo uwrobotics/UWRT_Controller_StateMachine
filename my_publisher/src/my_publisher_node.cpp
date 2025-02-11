@@ -1,6 +1,6 @@
 #include "rclcpp/rclcpp.hpp"
-#include "msg/my_custom_msg.hpp"
-#include "geometry_msgs/msg/pose.hpp"
+#include "msg/my_custom_msg.msg"
+#include "geometry_msgs/msg/pose.msg"
 
 class MyPublisher : public rclcpp::Node
 {
