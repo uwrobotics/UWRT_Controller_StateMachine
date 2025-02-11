@@ -20,7 +20,7 @@ include_directories(include ${CMAKE_CURRENT_BINARY_DIR}/rosidl_generator_cpp)
 add_executable(my_publisher_node src/my_publisher_node.cpp)
 
 # Link required dependencies
-ament_target_dependencies(my_publisher_node rclcpp geometry_msgs my_publisher)
+ament_target_dependencies(my_publisher_node rclcpp geometry_msgs)
 
 # Ensure generated messages are built before the node
 add_dependencies(my_publisher_node ${PROJECT_NAME}_generate_interfaces)
