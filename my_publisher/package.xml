@@ -11,6 +11,7 @@
 
   <depend>geometry_msgs</depend>
   <depend>rosidl_default_generators</depend>
+  <depend>rosidl_interface_packages</depend>
   <depend>rclcpp</depend>
 
   <test_depend>ament_lint_auto</test_depend>
