@@ -1,3 +1,0 @@
-[submodule "UWRT_ROS_MSG"]
-	path = UWRT_ROS_MSG
-	url = https://github.com/uwrobotics/UWRT_ROS_MSG.git
