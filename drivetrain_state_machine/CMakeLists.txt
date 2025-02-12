@@ -17,7 +17,7 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 
 add_executable(lifecycle_talker
-  src/lifecycle_talker.cpp)
+  src/state_machine.cpp)
 ament_target_dependencies(lifecycle_talker
   "lifecycle_msgs"
   "rclcpp_lifecycle"
