@@ -15,7 +15,7 @@ find_package(rclcpp_lifecycle REQUIRED)
 find_package(lifecycle_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
-find_package(UWRT_ROS_MSG REQUIRED)     
+find_package(uwrt_ros_msg REQUIRED)     
 
 add_executable(lifecycle_talker
   src/state_machine.cpp)
