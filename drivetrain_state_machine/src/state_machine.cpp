@@ -16,6 +16,7 @@
 #include "rcutils/logging_macros.h"
 
 #include "std_msgs/msg/string.hpp"
+#include "UWRT_ROS_MSG/msg_interface/OdriveCmd.hpp"
 
 using namespace std::chrono_literals;
 
