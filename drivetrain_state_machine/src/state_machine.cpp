@@ -20,7 +20,7 @@
 using namespace std::chrono_literals;
 
 
-'''
+/** 
 on_configure: 
 - request bus status (.srv)
 - send calibration request (.srv) [assert state transition]
@@ -39,7 +39,7 @@ on_configure:
         - roll back to on_configure
 - clean_up
     - request bus off
-'''
+*/
 /// StateMachine inheriting from rclcpp_lifecycle::LifecycleNode
 /**
  * The lifecycle talker does not like the regular "talker" node
