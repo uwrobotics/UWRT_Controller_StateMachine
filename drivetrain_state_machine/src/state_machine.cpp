@@ -8,22 +8,20 @@ bool StateMachine::request_odrive_cmd
   request->axis_id = axis_id;
   request->cmd = cmd;
   request->payload = payload;
-
   while(motor_cmd_->wait_for_service(1s)) {
     if (!rclcpp::ok()) {
+      std::cout << "return" << std::endl;
       RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
       return 0;
     }
+    std::cout << "Failed to connect" << std::endl;
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
   }
 
   auto result = motor_cmd_->async_send_request(request);
-  if (rclcpp::spin_until_future_complete(shared_from_this(), result) ==
-    rclcpp::FutureReturnCode::SUCCESS) {
-    return result.get() -> status;
-  } else {
-    return NULL;
-  }
+  std::cout << result.get()->status << std::endl;
+  // Verify this is a blocking function and work if there is a server
+  return result.get()->status
 }
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
@@ -31,9 +29,9 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   motor_cmd_ = this->create_client<uwrt_ros_msg::srv::OdriveCmd>("odrive_cmd_service");
   RCLCPP_INFO(get_logger(), "on_configure() is called.");
 
-  bool result = false;
+  bool result = true;
   for(const std::string& axis: axis_id_set) {
-    //result = this->request_odrive_cmd(axis, "Set_Axis_State", "Axis_Requested_State: FULL_CALIBRATION_SEQUENCE;")
+    auto result = this->request_odrive_cmd(axis, "Set_Axis_State", "Axis_Requested_State: FULL_CALIBRATION_SEQUENCE;");
     std::cout << axis << std::endl;
   }
   if (result == false) {
@@ -45,7 +43,7 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
 StateMachine::on_activate(const rclcpp_lifecycle::State &) {
-    return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+  return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
