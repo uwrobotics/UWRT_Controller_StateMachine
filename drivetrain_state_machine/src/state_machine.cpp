@@ -1,13 +1,13 @@
-#include "state_machine.hpp"
+#include "../include/drivetrain_state_machine/state_machine.hpp"
 
 
 bool StateMachine::request_odrive_cmd
 (std::string axis_id, std::string cmd, std::string payload) {
-  auto request = uwrt_ros_msg::srv::OdriveCmd();
+  auto request = std::make_shared<uwrt_ros_msg::srv::OdriveCmd::Request>();;
     
-  request.axis_id = axis_id;
-  request.cmd = cmd;
-  request.payload = payload
+  request->axis_id = axis_id;
+  request->cmd = cmd;
+  request->payload = payload;
 
   while(motor_cmd_->wait_for_service(1s)) {
     if (!rclcpp::ok()) {
@@ -17,35 +17,28 @@ bool StateMachine::request_odrive_cmd
     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "service not available, waiting again...");
   }
 
-  auto result = motor_cmd_ ->async_send_request(request);
-
-  if (rclcpp::spin_until_future_complete(node, result) ==
-  rclcpp::FutureReturnCode::SUCCESS) {
-    RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "result: %d", result.get()->status);
+  auto result = motor_cmd_->async_send_request(request);
+  if (rclcpp::spin_until_future_complete(shared_from_this(), result) ==
+    rclcpp::FutureReturnCode::SUCCESS) {
+    return result.get() -> status;
   } else {
-    RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service odrive_command");
+    return NULL;
   }
-
-  return result.get()->status;
 }
 
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-StateMachine::StateMachine(const rclcpp_lifecycle::State &) {
-  motor_cmd_ = this->create_client<uwrt_ros_msg::srv::OdriveCmd>("odrive_command")
+StateMachine::on_configure(const rclcpp_lifecycle::State &) {
+  motor_cmd_ = this->create_client<uwrt_ros_msg::srv::OdriveCmd>("odrive_cmd_service");
   RCLCPP_INFO(get_logger(), "on_configure() is called.");
-
-  motor_cmd_->on_activate();
 
   bool result = false;
   for(const std::string& axis: axis_id_set) {
     //result = this->request_odrive_cmd(axis, "Set_Axis_State", "Axis_Requested_State: FULL_CALIBRATION_SEQUENCE;")
-    std::cout << axis_id << std::endl;
+    std::cout << axis << std::endl;
   }
   if (result == false) {
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
   }
-
-  motor_cmd_->on_deactivate();
 
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }

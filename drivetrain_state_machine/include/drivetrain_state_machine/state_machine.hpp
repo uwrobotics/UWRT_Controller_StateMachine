@@ -30,6 +30,9 @@ on_configure:
 #include <utility>
 #include <vector>
 
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp/publisher.hpp"
+
 #include "rclcpp_lifecycle/lifecycle_node.hpp"
 #include "rclcpp_lifecycle/lifecycle_publisher.hpp"
 #include "lifecycle_msgs/msg/transition.hpp"
@@ -52,7 +55,7 @@ class StateMachine : public rclcpp_lifecycle::LifecycleNode {
         }
 
 
-        bool StateMachine::request_odrive_cmd(std::string axis_id, std::string cmd, std::string payload);
+        bool request_odrive_cmd(std::string axis_id, std::string cmd, std::string payload);
 
         rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
         on_configure(const rclcpp_lifecycle::State &);
@@ -70,7 +73,7 @@ class StateMachine : public rclcpp_lifecycle::LifecycleNode {
         on_shutdown(const rclcpp_lifecycle::State & state);
 
     private:
-        std::shared_ptr<rclcpp_lifecycle::LifecyclePublisher<uwrt_ros_msg::srv::OdriveCmd>> motor_cmd_;
+        rclcpp::Client<uwrt_ros_msg::srv::OdriveCmd>::SharedPtr motor_cmd_;
 
         std::vector<std::string> axis_id_set = {"Left", "Right"};
 };
