@@ -23,6 +23,7 @@ ament_target_dependencies(lifecycle_talker
   "lifecycle_msgs"
   "rclcpp_lifecycle"
   "std_msgs"
+  "uwrt_ros_msg"
 )
 
 install(TARGETS
