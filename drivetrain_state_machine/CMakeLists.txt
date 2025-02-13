@@ -17,8 +17,10 @@ find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(uwrt_ros_msg REQUIRED)     
 
+set(HEADER_FILES include/drivetrain_state_machine/state_machine.hpp)
+
 add_executable(lifecycle_talker
-  src/state_machine.cpp)
+  src/state_machine.cpp HEADER_FILES)
 ament_target_dependencies(lifecycle_talker
   "lifecycle_msgs"
   "rclcpp_lifecycle"
