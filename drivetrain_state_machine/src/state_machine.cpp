@@ -1,93 +1,135 @@
-#include "../include/drivetrain_state_machine/state_machine.hpp"
+#ifndef DRIVETRAIN_H
+#define DRIVETRAIN_H
 
-bool StateMachine::request_odrive_cmd(std::string axis_id, std::string cmd, std::string payload) {
-  // Create a request object
-  auto request = std::make_shared<uwrt_ros_msg::srv::OdriveCmd::Request>();
-  request->axis_id = axis_id;
-  request->cmd = cmd;
-  request->payload = payload;
+/**
+ * @file drivetrain.hpp
+ * @brief Defines the StateMachine class for managing the lifecycle of the drivetrain system.
+ *
+ * This class is a ROS 2 LifecycleNode that controls the state transitions of the drivetrain.
+ * It includes methods for configuring, activating, deactivating, cleaning up, and shutting down.
+ */
 
-  // Wait for service to be available
-  while (!motor_cmd_->wait_for_service(1s)) {
-      if (!rclcpp::ok()) {
-          RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
-          return false;  // Service is not available, return false
-      }
-      RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Service not available, waiting again...");
-  }
+/* Standard Library Includes */
+#include <chrono>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <thread>
+#include <utility>
+#include <vector>
 
-  // Send the asynchronous request
-  auto result = motor_cmd_->async_send_request(request);
-  // Wait for the result to be ready
-  result.wait_for(2s);
+/* ROS Base Dependencies */
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp/publisher.hpp"
 
-  if (result.valid() && result.wait_for(std::chrono::seconds(2)) == std::future_status::ready) {
-      // If the result is ready, handle it
-      RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Received response: %d", result.get()->status);
-      return result.get()->status;  // Adjust this as needed based on expected status
-  } else {
-      std::cout << "No response received in time" << std::endl;
-      // If the result did not arrive in time, return false
-      RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Request timed out");
-      return false;
-  }
-}
+/* ROS Lifecycle Dependencies */
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
+#include "rclcpp_lifecycle/lifecycle_publisher.hpp"
+#include "lifecycle_msgs/msg/transition.hpp"
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-StateMachine::on_configure(const rclcpp_lifecycle::State &) {
-  motor_cmd_ = this->create_client<uwrt_ros_msg::srv::OdriveCmd>("OdriveCmd");
-  RCLCPP_INFO(get_logger(), "on_configure() is called.");
+/* ROS Logging Dependencies */
+#include "rcutils/logging_macros.h"
 
-  bool success = true; // Initialize the success flag to true
-  for (const std::string& axis : axis_id_set) {
-      bool result = this->request_odrive_cmd(axis, "Set_Axis_State", "Axis_Requested_State: FULL_CALIBRATION_SEQUENCE;");
-      std::cout << "Sending request for axis: " << axis << std::endl;
+/* Custom Service Message */
+#include "uwrt_ros_msg/srv/odrive_cmd.hpp"
 
-      // If any request fails, set success to false
-      if (!result) {
-          RCLCPP_ERROR(get_logger(), "Request for axis %s failed", axis.c_str());
-          success = false;
-      }
-  }
+using namespace std::chrono_literals;
 
-  if (!success) {
-      return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
-  }
+/**
+ * @class StateMachine
+ * @brief Manages the lifecycle states of the drivetrain system.
+ *
+ * This class handles state transitions such as configuration, activation, deactivation,
+ * cleanup, and shutdown of the drivetrain system using ROS 2 lifecycle management.
+ */
+class StateMachine : public rclcpp_lifecycle::LifecycleNode {
+public:
+    /**
+     * @brief Constructor for the StateMachine class.
+     * @param node_name Name of the node.
+     * @param intra_process_comms Enables intra-process communication if set to true.
+     */
+    explicit StateMachine(const std::string &node_name, bool intra_process_comms = false)
+        : rclcpp_lifecycle::LifecycleNode(
+              node_name, rclcpp::NodeOptions().use_intra_process_comms(intra_process_comms)) {}
 
-  return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
-}
+    /**
+     * @brief Sends an ODrive command using a ROS service request.
+     * @param axis_id The ID of the axis to send the command to.
+     * @param cmd The command to be executed.
+     * @param payload Additional data for the command.
+     * @return True if the request was successful, false otherwise.
+     */
+    bool request_odrive_cmd(std::string axis_id, std::string cmd, std::string payload);
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-StateMachine::on_activate(const rclcpp_lifecycle::State &) {
-  return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
-}
+    /**
+     * @brief Handles the configuration state transition.
+     *
+     * Performs necessary setup steps, including requesting bus status,
+     * sending calibration requests, and conducting full axis calibration.
+     *
+     * @param state The current lifecycle state.
+     * @return Lifecycle transition success or failure.
+     */
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+    on_configure(const rclcpp_lifecycle::State &state);
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-StateMachine::on_deactivate(const rclcpp_lifecycle::State &) {
-  return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
-}
+    /**
+     * @brief Handles the activation state transition.
+     *
+     * This step involves asserting the current control mode, sending
+     * command requests, and preparing the state machine for active operation.
+     *
+     * @param state The current lifecycle state.
+     * @return Lifecycle transition success or failure.
+     */
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+    on_activate(const rclcpp_lifecycle::State &state);
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-StateMachine::on_cleanup(const rclcpp_lifecycle::State &) {
-  motor_cmd_.reset();
-  RCUTILS_LOG_INFO_NAMED(get_name(), "on_cleanup is called.");
-  return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
-}
+    /**
+     * @brief Handles the deactivation state transition.
+     *
+     * Moves the drivetrain into an idle state, checks for errors,
+     * clears errors if necessary, and rolls back to the configuration state.
+     *
+     * @param state The current lifecycle state.
+     * @return Lifecycle transition success or failure.
+     */
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+    on_deactivate(const rclcpp_lifecycle::State &state);
 
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-StateMachine::on_shutdown(const rclcpp_lifecycle::State &state) {
-  motor_cmd_.reset();
-  RCUTILS_LOG_INFO_NAMED(get_name(), "on_shutdown is called from state %s.", state.label().c_str());
-  return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
-}
+    /**
+     * @brief Handles the cleanup state transition.
+     *
+     * Resets bus settings and prepares the system for reconfiguration.
+     *
+     * @param state The current lifecycle state.
+     * @return Lifecycle transition success or failure.
+     */
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+    on_cleanup(const rclcpp_lifecycle::State &state);
 
-int main(int argc, char *argv[]) {
-  setvbuf(stdout, NULL, _IONBF, BUFSIZ);
-  rclcpp::init(argc, argv);
-  rclcpp::executors::SingleThreadedExecutor exe;
-  std::shared_ptr<StateMachine> lc_node = std::make_shared<StateMachine>("lc_talker");
-  exe.add_node(lc_node->get_node_base_interface());
-  exe.spin();
-  rclcpp::shutdown();
-  return 0;
-}
+    /**
+     * @brief Handles the shutdown state transition.
+     *
+     * Requests the bus to turn off and ensures a proper shutdown sequence.
+     *
+     * @param state The current lifecycle state.
+     * @return Lifecycle transition success or failure.
+     */
+    rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+    on_shutdown(const rclcpp_lifecycle::State &state);
+
+private:
+    /**
+     * @brief ROS service client for sending ODrive commands.
+     */
+    rclcpp::Client<uwrt_ros_msg::srv::OdriveCmd>::SharedPtr motor_cmd_;
+
+    /**
+     * @brief List of axis identifiers used in the drivetrain system.
+     */
+    std::vector<std::string> axis_id_set = {"Left", "Right"};
+};
+
+#endif // DRIVETRAIN_H
