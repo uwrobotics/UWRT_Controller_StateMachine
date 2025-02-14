@@ -32,9 +32,6 @@ bool StateMachine::request_odrive_cmd(const std::string &axis_id, const std::str
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Service not available, waiting again...");
     }
 
-    auto result = motor_cmd_->async_send_request(request);
-    auto future = result.wait_for(2s);
-
     auto future_result = motor_cmd_->async_send_request(request);
     if (future_result.wait_for(std::chrono::seconds(2)) == std::future_status::ready) {
         try {
