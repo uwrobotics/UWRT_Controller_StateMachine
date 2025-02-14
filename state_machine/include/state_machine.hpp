@@ -23,6 +23,7 @@
 
 /* Custom Message */
 #include "uwrt_ros_msg/msg/odrive_cmd.hpp"
+#include "uwrt_ros_msg/msg/msg_response.hpp"
 
 /**
  * @class StateMachine
@@ -62,6 +63,8 @@ private:
   /// Lifecycle publisher for OdriveCmd messages.
   rclcpp_lifecycle::LifecyclePublisher<uwrt_ros_msg::msg::OdriveCmd>::SharedPtr motor_cmd_;
 
+  rclcpp::Subscription<uwrt_ros_msg::msg::MsgResponse>::SharedPtr cmd_response_;
+
   /// List of axis identifiers used in the drivetrain system.
   std::vector<std::string> axis_id_set_ = {"Left", "Right"};
 
@@ -75,6 +78,8 @@ private:
   bool request_odrive_cmd(const std::string & axis_id,
                           const std::string & cmd,
                           const std::string & payload);
+
+  bool StateMachine::response_callback(const auto & msg) const;
 };
 
 #endif  // STATE_MACHINE_HPP_
