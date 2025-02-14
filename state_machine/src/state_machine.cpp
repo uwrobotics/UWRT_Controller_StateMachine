@@ -6,52 +6,46 @@
  */
 
 /**
- * @brief Sends an ODrive command via a ROS service request.
+ * @brief Publishes an ODrive command via a ROS message.
  * 
- * This method constructs a request message and sends it asynchronously
- * to control an ODrive motor. It ensures that the service is available before
- * sending the request and waits for a response.
+ * This method constructs a message and publishes it asynchronously
+ * to control an ODrive motor.
  * 
  * @param axis_id The identifier of the motor axis.
  * @param cmd The command to execute on the motor.
  * @param payload Additional command parameters.
- * @return True if the request was successful, false otherwise.
+ * @return True if the message was published successfully, false otherwise.
  */
-bool StateMachine::request_odrive_cmd(const std::string &axis_id, const std::string &cmd, const std::string &payload) {
-    auto request = std::make_shared<uwrt_ros_msg::srv::OdriveCmd::Request>();
+void StateMachine::request_odrive_cmd(const std::string &axis_id, const std::string &cmd, const std::string &payload) {
+    // Create the message
+    auto msg = std::make_shared<uwrt_ros_msg::msg::OdriveCmd>();
 
-    request->axis_id = axis_id;
-    request->cmd = cmd;
-    request->payload = payload;
+    msg->axis_id = axis_id;
+    msg->cmd = cmd;
+    msg->payload = payload;
 
-    while (!motor_cmd_->wait_for_service(1s)) {
-        if (!rclcpp::ok()) {
-            RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
-            return false;
-        }
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Service not available, waiting again...");
-    }
+    // Publish the message.
+    motor_cmd_->publish(*msg);
+    RCLCPP_INFO(get_logger(), "Published OdriveCmd: axis_id='%s', cmd='%s', payload='%s'", 
+                axis_id.c_str(), cmd.c_str(), payload.c_str());
 
-    auto future_result = motor_cmd_->async_send_request(request);
-    if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), future_result) == rclcpp::FutureReturnCode::SUCCESS) {
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Sum: %d", future_result.get()->status);
-        return future_result.get()->status;
-    } else {
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service add_two_ints");
-    }
+    // Since we're publishing a message, we assume success if publish() is called.
+    return true;
 }
 
 /**
  * @brief Configures the state machine and initializes motor communication.
  * 
- * This method initializes the service client for motor commands and sends a
- * calibration request for each axis.
+ * This method initializes the publisher for motor commands and sends a
+ * calibration message for each axis.
  * 
  * @return SUCCESS if configuration is successful, FAILURE otherwise.
  */
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
 StateMachine::on_configure(const rclcpp_lifecycle::State &) {
-    motor_cmd_ = this->create_client<uwrt_ros_msg::srv::OdriveCmd>("OdriveCmd");
+    // Create a publisher for the OdriveCmd message.
+    // Using a QoS history depth of 10.
+    motor_cmd_ = this->create_publisher<uwrt_ros_msg::msg::OdriveCmd>("OdriveCmd", rclcpp::QoS(10));
     RCLCPP_INFO(get_logger(), "on_configure() is called.");
 
     bool success = true;
@@ -61,8 +55,9 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
             success = false;
         }
     }
-    return success ? rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS : 
-                     rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
+    return success ? 
+        rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS : 
+        rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
 }
 
 /**
@@ -84,7 +79,7 @@ StateMachine::on_deactivate(const rclcpp_lifecycle::State &) {
 }
 
 /**
- * @brief Cleans up resources and resets the service client.
+ * @brief Cleans up resources and resets the publisher.
  */
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
 StateMachine::on_cleanup(const rclcpp_lifecycle::State &) {

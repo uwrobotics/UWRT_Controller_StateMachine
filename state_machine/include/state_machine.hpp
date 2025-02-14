@@ -31,7 +31,7 @@
 #include "rcutils/logging_macros.h"
 
 /* Custom Service Message */
-#include "uwrt_ros_msg/srv/odrive_cmd.hpp"
+#include "uwrt_ros_msg/msg/odrive_cmd.hpp"
 
 using namespace std::chrono_literals;
 
@@ -49,7 +49,7 @@ public:
      * @param node_name Name of the node.
      * @param intra_process_comms Enables intra-process communication if set to true.
      */
-    explicit StateMachine(const std::string &node_name, bool intra_process_comms = false)
+    explicit StateMachine(const std::string &node_name, bool intra_process_comms = true)
         : rclcpp_lifecycle::LifecycleNode(
               node_name, rclcpp::NodeOptions().use_intra_process_comms(intra_process_comms)) {}
 
