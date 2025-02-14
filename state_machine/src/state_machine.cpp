@@ -17,7 +17,7 @@ bool StateMachine::request_odrive_cmd(const std::string & axis_id,
   return true;
 }
 
-bool StateMachine::response_callback(const auto & msg) const {
+bool StateMachine::response_callback(const uwrt_ros_msg::msg::OdriveCmd & msg) const {
   RCLCPP_INFO(this->get_logger(), "Msg Response: %d timestamp: %s", msg.status, msg.timestamp.c_str());
 }
 
@@ -27,7 +27,7 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   // Create a lifecycle publisher with a QoS depth of 10.
   motor_cmd_ = this->create_publisher<uwrt_ros_msg::msg::OdriveCmd>("OdriveCmd", 10);
   cmd_response_ = this->create_subscription<uwrt_ros_msg::msg::MsgResponse>(
-    "MsgResponse", 10, std::bind(StateMachine::response_callback, this, std::placeholders::_1));
+    "MsgResponse", 10, std::bind(&StateMachine::response_callback, this, std::placeholders::_1));
   RCLCPP_INFO(get_logger(), "on_configure() is called.");
 
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
