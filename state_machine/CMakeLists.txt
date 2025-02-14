@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(drivetrain_state_machine)
+project(state_machine)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -7,27 +7,32 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
-# uncomment the following section in order to fill in
-# further dependencies manually.
-# find_package(<dependency> REQUIRED)
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(lifecycle_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
-find_package(std_msgs REQUIRED)
 find_package(uwrt_ros_msg REQUIRED)     
 
-add_executable(lifecycle_talker
-  src/state_machine.cpp include/drivetrain_state_machine/state_machine.hpp)
-ament_target_dependencies(lifecycle_talker
+# Add include directory
+set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
+include_directories(${INCLUDE_DIR})
+
+# Find all Header files
+file(GLOB_RECURSE HEADERS "include/*.hpp")
+
+# Add all source file
+set(SOURCE_FILE  "src/state_machine.cpp")
+
+
+add_executable(state_machine_talker ${SOURCE_FILE} ${HEADERS})
+ament_target_dependencies(state_machine_talker
   "lifecycle_msgs"
   "rclcpp_lifecycle"
-  "std_msgs"
   "uwrt_ros_msg"
 )
 
 install(TARGETS
-  lifecycle_talker
+  state_machine_talker
   DESTINATION lib/${PROJECT_NAME})
 
 
