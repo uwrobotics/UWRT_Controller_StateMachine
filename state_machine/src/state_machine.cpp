@@ -1,11 +1,6 @@
 #include "state_machine.hpp"
 
 /**
- * @file state_machine.cpp
- * @brief Implements the StateMachine class for managing the drivetrain lifecycle.
- */
-
-/**
  * @brief Publishes an ODrive command via a ROS message.
  * 
  * This method constructs a message and publishes it asynchronously
@@ -19,7 +14,6 @@
 bool StateMachine::request_odrive_cmd(const std::string &axis_id, const std::string &cmd, const std::string &payload) {
     // Create the message
     auto msg = std::make_shared<uwrt_ros_msg::msg::OdriveCmd>();
-
     msg->axis_id = axis_id;
     msg->cmd = cmd;
     msg->payload = payload;
@@ -29,7 +23,7 @@ bool StateMachine::request_odrive_cmd(const std::string &axis_id, const std::str
     RCLCPP_INFO(get_logger(), "Published OdriveCmd: axis_id='%s', cmd='%s', payload='%s'", 
                 axis_id.c_str(), cmd.c_str(), payload.c_str());
 
-    // Since we're publishing a message, we assume success if publish() is called.
+    // Since publishing is fire-and-forget, return true if the publish() function is called.
     return true;
 }
 
@@ -65,7 +59,7 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
  */
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
 StateMachine::on_activate(const rclcpp_lifecycle::State &) {
-    RCUTILS_LOG_INFO_NAMED(get_name(), "on_activate is called.");
+    RCUTILS_LOG_INFO_NAMED(get_name(), "on_activate() is called.");
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
@@ -74,7 +68,7 @@ StateMachine::on_activate(const rclcpp_lifecycle::State &) {
  */
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
 StateMachine::on_deactivate(const rclcpp_lifecycle::State &) {
-    RCUTILS_LOG_INFO_NAMED(get_name(), "on_deactivate is called.");
+    RCUTILS_LOG_INFO_NAMED(get_name(), "on_deactivate() is called.");
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
@@ -84,7 +78,7 @@ StateMachine::on_deactivate(const rclcpp_lifecycle::State &) {
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
 StateMachine::on_cleanup(const rclcpp_lifecycle::State &) {
     motor_cmd_.reset();
-    RCUTILS_LOG_INFO_NAMED(get_name(), "on_cleanup is called.");
+    RCUTILS_LOG_INFO_NAMED(get_name(), "on_cleanup() is called.");
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
@@ -96,7 +90,7 @@ StateMachine::on_cleanup(const rclcpp_lifecycle::State &) {
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
 StateMachine::on_shutdown(const rclcpp_lifecycle::State &state) {
     motor_cmd_.reset();
-    RCUTILS_LOG_INFO_NAMED(get_name(), "on_shutdown is called from state %s.", state.label().c_str());
+    RCUTILS_LOG_INFO_NAMED(get_name(), "on_shutdown() is called from state %s.", state.label().c_str());
     return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 

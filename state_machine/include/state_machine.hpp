@@ -30,7 +30,7 @@
 /* ROS Logging Dependencies */
 #include "rcutils/logging_macros.h"
 
-/* Custom Service Message */
+/* Custom Message */
 #include "uwrt_ros_msg/msg/odrive_cmd.hpp"
 
 using namespace std::chrono_literals;
@@ -56,8 +56,8 @@ public:
     /**
      * @brief Handles the configuration state transition.
      *
-     * Performs necessary setup steps, including requesting bus status,
-     * sending calibration requests, and conducting full axis calibration.
+     * Performs necessary setup steps, including creating a publisher for ODrive commands
+     * and sending an initial calibration message for each axis.
      *
      * @param state The current lifecycle state.
      * @return Lifecycle transition success or failure.
@@ -68,8 +68,7 @@ public:
     /**
      * @brief Handles the activation state transition.
      *
-     * This step involves asserting the current control mode, sending
-     * command requests, and preparing the state machine for active operation.
+     * Prepares the node for active operation.
      *
      * @param state The current lifecycle state.
      * @return Lifecycle transition success or failure.
@@ -80,8 +79,7 @@ public:
     /**
      * @brief Handles the deactivation state transition.
      *
-     * Moves the drivetrain into an idle state, checks for errors,
-     * clears errors if necessary, and rolls back to the configuration state.
+     * Pauses the operation of the node.
      *
      * @param state The current lifecycle state.
      * @return Lifecycle transition success or failure.
@@ -92,7 +90,7 @@ public:
     /**
      * @brief Handles the cleanup state transition.
      *
-     * Resets bus settings and prepares the system for reconfiguration.
+     * Resets the publisher and cleans up resources.
      *
      * @param state The current lifecycle state.
      * @return Lifecycle transition success or failure.
@@ -103,7 +101,7 @@ public:
     /**
      * @brief Handles the shutdown state transition.
      *
-     * Requests the bus to turn off and ensures a proper shutdown sequence.
+     * Releases resources and logs the shutdown sequence.
      *
      * @param state The current lifecycle state.
      * @return Lifecycle transition success or failure.
@@ -113,9 +111,9 @@ public:
 
 private:
     /**
-     * @brief ROS service client for sending ODrive commands.
+     * @brief ROS publisher for sending ODrive command messages.
      */
-    rclcpp::Client<uwrt_ros_msg::msg::OdriveCmd>::SharedPtr motor_cmd_;
+    rclcpp::Publisher<uwrt_ros_msg::msg::OdriveCmd>::SharedPtr motor_cmd_;
 
     /**
      * @brief List of axis identifiers used in the drivetrain system.
@@ -123,11 +121,11 @@ private:
     std::vector<std::string> axis_id_set = {"Left", "Right"};
 
     /**
-     * @brief Sends an ODrive command using a ROS service request.
+     * @brief Publishes an ODrive command using a ROS message.
      * @param axis_id The ID of the axis to send the command to.
      * @param cmd The command to be executed.
      * @param payload Additional data for the command.
-     * @return True if the request was successful, false otherwise.
+     * @return True if the message was published successfully, false otherwise.
      */
     bool request_odrive_cmd(const std::string &axis_id, const std::string &cmd, const std::string &payload);
 };
