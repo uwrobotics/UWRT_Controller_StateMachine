@@ -1,3 +1,6 @@
 [submodule "py_odrive"]
 	path = py_odrive
 	url = https://github.com/uwrobotics/py_odrive.git
+[submodule "uwrt_ros_msg"]
+	path = uwrt_ros_msg
+	url = https://github.com/uwrobotics/uwrt_ros_msg.git
