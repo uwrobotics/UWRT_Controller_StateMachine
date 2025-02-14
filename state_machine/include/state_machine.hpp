@@ -17,7 +17,6 @@
 #include <thread>
 #include <utility>
 #include <vector>
-#include <future>
 
 /* ROS Base Dependencies */
 #include "rclcpp/rclcpp.hpp"
@@ -131,10 +130,6 @@ private:
      * @return True if the request was successful, false otherwise.
      */
     bool request_odrive_cmd(const std::string &axis_id, const std::string &cmd, const std::string &payload);
-    
-    void odrive_cmd_response_callback(
-        rclcpp::Client<uwrt_ros_msg::srv::OdriveCmd>::SharedFuture future_result,
-        std::promise<int>& response_promise);    
 };
 
 #endif // DRIVETRAIN_H
