@@ -45,7 +45,7 @@ rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
 StateMachine::on_configure(const rclcpp_lifecycle::State &) {
     // Create a publisher for the OdriveCmd message.
     // Using a QoS history depth of 10.
-    motor_cmd_ = this->create_publisher<uwrt_ros_msg::msg::OdriveCmd>("OdriveCmd", rclcpp::QoS(10));
+    motor_cmd_ = this->create_publisher<uwrt_ros_msg::msg::OdriveCmd>("OdriveCmd", 10);
     RCLCPP_INFO(get_logger(), "on_configure() is called.");
 
     bool success = true;
