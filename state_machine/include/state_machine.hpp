@@ -17,6 +17,7 @@
 #include <thread>
 #include <utility>
 #include <vector>
+#include <future>
 
 /* ROS Base Dependencies */
 #include "rclcpp/rclcpp.hpp"
@@ -52,15 +53,6 @@ public:
     explicit StateMachine(const std::string &node_name, bool intra_process_comms = false)
         : rclcpp_lifecycle::LifecycleNode(
               node_name, rclcpp::NodeOptions().use_intra_process_comms(intra_process_comms)) {}
-
-    /**
-     * @brief Sends an ODrive command using a ROS service request.
-     * @param axis_id The ID of the axis to send the command to.
-     * @param cmd The command to be executed.
-     * @param payload Additional data for the command.
-     * @return True if the request was successful, false otherwise.
-     */
-    bool request_odrive_cmd(const std::string &axis_id, const std::string &cmd, const std::string &payload);
 
     /**
      * @brief Handles the configuration state transition.
@@ -130,6 +122,19 @@ private:
      * @brief List of axis identifiers used in the drivetrain system.
      */
     std::vector<std::string> axis_id_set = {"Left", "Right"};
+
+    /**
+     * @brief Sends an ODrive command using a ROS service request.
+     * @param axis_id The ID of the axis to send the command to.
+     * @param cmd The command to be executed.
+     * @param payload Additional data for the command.
+     * @return True if the request was successful, false otherwise.
+     */
+    bool request_odrive_cmd(const std::string &axis_id, const std::string &cmd, const std::string &payload);
+    
+    void odrive_cmd_response_callback(
+        rclcpp::Client<uwrt_ros_msg::srv::OdriveCmd>::SharedFuture future_result,
+        std::promise<int>& response_promise);    
 };
 
 #endif // DRIVETRAIN_H

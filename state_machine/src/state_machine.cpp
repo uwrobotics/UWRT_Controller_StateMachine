@@ -18,33 +18,53 @@
  * @return True if the request was successful, false otherwise.
  */
 bool StateMachine::request_odrive_cmd(const std::string &axis_id, const std::string &cmd, const std::string &payload) {
+    // Create the request
     auto request = std::make_shared<uwrt_ros_msg::srv::OdriveCmd::Request>();
-
     request->axis_id = axis_id;
     request->cmd = cmd;
     request->payload = payload;
 
-    while (!motor_cmd_->wait_for_service(1s)) {
+    // Wait for service availability
+    while (!motor_cmd_->wait_for_service(std::chrono::seconds(1))) {
         if (!rclcpp::ok()) {
-            RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Interrupted while waiting for the service. Exiting.");
+            RCLCPP_ERROR(get_logger(), "Interrupted while waiting for service. Exiting.");
             return false;
         }
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Service not available, waiting again...");
+        RCLCPP_INFO(get_logger(), "Service not available, waiting again...");
     }
 
-    auto future_result = motor_cmd_->async_send_request(request);
-    if (future_result.wait_for(std::chrono::seconds(5)) == std::future_status::ready) {
-        try {
-            auto response = future_result.get();
-            RCLCPP_INFO(get_logger(), "Received response: %d", response->status);
-            return response->status;
-        } catch (const std::exception &e) {
-            RCLCPP_ERROR(get_logger(), "Exception caught: %s", e.what());
-            return false;
-        }
+    // Create a promise and get a future to wait for response
+    std::promise<int> response_promise;
+    std::future<int> response_future = response_promise.get_future();
+
+    // Send the request asynchronously with a callback
+    auto future_result = motor_cmd_->async_send_request(request,
+        [this, &response_promise](rclcpp::Client<uwrt_ros_msg::srv::OdriveCmd>::SharedFuture future) {
+            this->odrive_cmd_response_callback(future, response_promise);
+        });
+
+    // Wait for the response in a blocking way, but with a timeout
+    if (response_future.wait_for(std::chrono::seconds(5)) == std::future_status::ready) {
+        return response_future.get();
     } else {
         RCLCPP_ERROR(get_logger(), "Service call timed out.");
-        return false;
+        return false; // Return failure if response was not received in time
+    }
+}
+
+void StateMachine::odrive_cmd_response_callback(
+    rclcpp::Client<uwrt_ros_msg::srv::OdriveCmd>::SharedFuture future_result,
+    std::promise<int>& response_promise) {
+
+    try {
+        auto response = future_result.get();
+        RCLCPP_INFO(get_logger(), "Received response: %d", response->status);
+
+        // Fulfill the promise to wake up request_odrive_cmd()
+        response_promise.set_value(response->status);
+    } catch (const std::exception &e) {
+        RCLCPP_ERROR(get_logger(), "Exception in callback: %s", e.what());
+        response_promise.set_value(0); // Indicate failure
     }
 }
 
