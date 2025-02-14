@@ -115,7 +115,7 @@ private:
     /**
      * @brief ROS service client for sending ODrive commands.
      */
-    rclcpp::Client<uwrt_ros_msg::srv::OdriveCmd>::SharedPtr motor_cmd_;
+    rclcpp::Client<uwrt_ros_msg::msg::OdriveCmd>::SharedPtr motor_cmd_;
 
     /**
      * @brief List of axis identifiers used in the drivetrain system.
@@ -129,7 +129,7 @@ private:
      * @param payload Additional data for the command.
      * @return True if the request was successful, false otherwise.
      */
-    bool request_odrive_cmd(const std::string &axis_id, const std::string &cmd, const std::string &payload);
+    void request_odrive_cmd(const std::string &axis_id, const std::string &cmd, const std::string &payload);
 };
 
 #endif // DRIVETRAIN_H
