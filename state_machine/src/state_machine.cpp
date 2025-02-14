@@ -33,18 +33,10 @@ bool StateMachine::request_odrive_cmd(const std::string &axis_id, const std::str
     }
 
     auto future_result = motor_cmd_->async_send_request(request);
-    if (future_result.wait_for(std::chrono::seconds(5)) == std::future_status::ready) {
-        try {
-            auto response = future_result.get();
-            RCLCPP_INFO(get_logger(), "Received response: %d", response->status);
-            return response->status;
-        } catch (const std::exception &e) {
-            RCLCPP_ERROR(get_logger(), "Exception caught: %s", e.what());
-            return false;
-        }
+    if (rclcpp::spin_until_future_complete(&this, future_result) == rclcpp::FutureReturnCode::SUCCESS) {
+        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Sum: %ld", result.get()->sum);
     } else {
-        RCLCPP_ERROR(get_logger(), "Service call timed out.");
-        return false;
+        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service add_two_ints");
     }
 }
 
