@@ -60,7 +60,7 @@ public:
      * @param payload Additional data for the command.
      * @return True if the request was successful, false otherwise.
      */
-    bool request_odrive_cmd(std::string axis_id, std::string cmd, std::string payload);
+    bool request_odrive_cmd(const std::string &axis_id, const std::string &cmd, const std::string &payload);
 
     /**
      * @brief Handles the configuration state transition.
