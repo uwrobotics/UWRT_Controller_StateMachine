@@ -140,7 +140,7 @@ StateMachine::on_shutdown(const rclcpp_lifecycle::State &state) {
 int main(int argc, char *argv[]) {
     setvbuf(stdout, NULL, _IONBF, BUFSIZ);
     rclcpp::init(argc, argv);
-    rclcpp::executors::SingleThreadedExecutor exe;
+    rclcpp::executors::MultiThreadedExecutor exe;
     auto lc_node = std::make_shared<StateMachine>("lc_talker");
     exe.add_node(lc_node->get_node_base_interface());
     exe.spin();
