@@ -4,8 +4,7 @@
 // Publish an Odrive command message.
 bool StateMachine::request_odrive_cmd(const std::string & axis_id,
                                       const std::string & cmd,
-                                      const std::string & payload)
-{
+                                      const std::string & payload) {
   auto msg = std::make_shared<uwrt_ros_msg::msg::OdriveCmd>();
   msg->axis_id = axis_id;
   msg->cmd = cmd;
@@ -20,12 +19,21 @@ bool StateMachine::request_odrive_cmd(const std::string & axis_id,
 
 // on_configure: Create the lifecycle publisher and send an initial message.
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-StateMachine::on_configure(const rclcpp_lifecycle::State &)
-{
+StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   // Create a lifecycle publisher with a QoS depth of 10.
   motor_cmd_ = this->create_publisher<uwrt_ros_msg::msg::OdriveCmd>("OdriveCmd", 10);
   RCLCPP_INFO(get_logger(), "on_configure() is called.");
 
+  return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
+}
+
+// on_activate: Activate the lifecycle publisher so that messages are forwarded.
+rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
+StateMachine::on_activate(const rclcpp_lifecycle::State &) {
+  RCLCPP_INFO(get_logger(), "on_activate() is called.");
+  if (motor_cmd_) {
+    motor_cmd_->on_activate();
+  }
   bool success = true;
   // Send a calibration command for each axis.
   for (const auto & axis : axis_id_set_) {
@@ -40,21 +48,9 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &)
                  : rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;
 }
 
-// on_activate: Activate the lifecycle publisher so that messages are forwarded.
-rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-StateMachine::on_activate(const rclcpp_lifecycle::State &)
-{
-  RCLCPP_INFO(get_logger(), "on_activate() is called.");
-  if (motor_cmd_) {
-    motor_cmd_->on_activate();
-  }
-  return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
-}
-
 // on_deactivate: Deactivate the publisher.
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-StateMachine::on_deactivate(const rclcpp_lifecycle::State &)
-{
+StateMachine::on_deactivate(const rclcpp_lifecycle::State &) {
   RCLCPP_INFO(get_logger(), "on_deactivate() is called.");
   if (motor_cmd_) {
     motor_cmd_->on_deactivate();
@@ -64,8 +60,7 @@ StateMachine::on_deactivate(const rclcpp_lifecycle::State &)
 
 // on_cleanup: Clean up the publisher.
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-StateMachine::on_cleanup(const rclcpp_lifecycle::State &)
-{
+StateMachine::on_cleanup(const rclcpp_lifecycle::State &) {
   motor_cmd_.reset();
   RCLCPP_INFO(get_logger(), "on_cleanup() is called.");
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
@@ -73,16 +68,14 @@ StateMachine::on_cleanup(const rclcpp_lifecycle::State &)
 
 // on_shutdown: Shut down the node.
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
-StateMachine::on_shutdown(const rclcpp_lifecycle::State & state)
-{
+StateMachine::on_shutdown(const rclcpp_lifecycle::State & state) {
   motor_cmd_.reset();
   RCLCPP_INFO(get_logger(), "on_shutdown() is called from state %s.", state.label().c_str());
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
 // Main entry point.
-int main(int argc, char * argv[])
-{
+int main(int argc, char * argv[]) {
   rclcpp::init(argc, argv);
   // Create a MultiThreadedExecutor to allow concurrent callbacks.
   rclcpp::executors::MultiThreadedExecutor executor;
