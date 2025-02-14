@@ -37,13 +37,19 @@ bool StateMachine::request_odrive_cmd(const std::string &axis_id, const std::str
 
     std::cout << result << std::endl;
 
-    if (result.valid() && result.wait_for(2s) == std::future_status::ready) {
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Received response: %d", result.get()->status);
-        return result.get()->status;
+    // if (result.valid() && result.wait_for(2s) == std::future_status::ready) {
+    //     RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Received response: %d", result.get()->status);
+    //     return result.get()->status;
+    // } else {
+    //     RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Request timed out");
+    //     std::cout << result.valid()->status << std::endl;
+    //     return false;
+    // }
+    if (future == std::future_status::ready) {
+        auto response = result.get();
+        RCLCPP_INFO(this->get_logger(), "Service Response: %d", response->status);
     } else {
-        RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Request timed out");
-        std::cout << result.get()->status << std::endl;
-        return false;
+        RCLCPP_ERROR(this->get_logger(), "Service call failed.");
     }
 }
 
