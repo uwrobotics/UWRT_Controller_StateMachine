@@ -79,7 +79,7 @@ private:
                           const std::string & cmd,
                           const std::string & payload);
 
-  bool StateMachine::response_callback(const auto & msg) const;
+  bool response_callback(const auto & msg) const;
 };
 
 #endif  // STATE_MACHINE_HPP_
