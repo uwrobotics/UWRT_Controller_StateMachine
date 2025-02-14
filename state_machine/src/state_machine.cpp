@@ -16,7 +16,7 @@
  * @param payload Additional command parameters.
  * @return True if the message was published successfully, false otherwise.
  */
-void StateMachine::request_odrive_cmd(const std::string &axis_id, const std::string &cmd, const std::string &payload) {
+bool StateMachine::request_odrive_cmd(const std::string &axis_id, const std::string &cmd, const std::string &payload) {
     // Create the message
     auto msg = std::make_shared<uwrt_ros_msg::msg::OdriveCmd>();
 
