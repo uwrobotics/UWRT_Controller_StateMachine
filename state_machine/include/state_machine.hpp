@@ -1,7 +1,34 @@
-#ifndef DRIVETRAIN_H
-#define DRIVETRAIN_H
+#ifndef STATE_MACHINE_HPP_
+#define STATE_MACHINE_HPP_
 
-// ... [other includes remain the same] ...
+/**
+ * @file state_machine.hpp
+ * @brief Defines the StateMachine class for managing the lifecycle of the drivetrain system.
+ *
+ * This class is a ROS 2 LifecycleNode that controls the state transitions of the drivetrain.
+ * It includes methods for configuring, activating, deactivating, cleaning up, and shutting down.
+ */
+
+/* Standard Library Includes */
+#include <chrono>
+#include <iostream>
+#include <memory>
+#include <string>
+#include <thread>
+#include <utility>
+#include <vector>
+
+/* ROS Base Dependencies */
+#include "rclcpp/rclcpp.hpp"
+#include "rclcpp/publisher.hpp"
+
+/* ROS Lifecycle Dependencies */
+#include "rclcpp_lifecycle/lifecycle_node.hpp"
+#include "rclcpp_lifecycle/lifecycle_publisher.hpp"
+#include "lifecycle_msgs/msg/transition.hpp"
+
+/* ROS Logging Dependencies */
+#include "rcutils/logging_macros.h"
 
 /* Custom Message */
 #include "uwrt_ros_msg/msg/odrive_cmd.hpp"
@@ -11,9 +38,17 @@ using namespace std::chrono_literals;
 /**
  * @class StateMachine
  * @brief Manages the lifecycle states of the drivetrain system.
+ *
+ * This class handles state transitions such as configuration, activation, deactivation,
+ * cleanup, and shutdown of the drivetrain system using ROS 2 lifecycle management.
  */
 class StateMachine : public rclcpp_lifecycle::LifecycleNode {
 public:
+    /**
+     * @brief Constructor for the StateMachine class.
+     * @param node_name Name of the node.
+     * @param intra_process_comms Enables intra-process communication if set to true.
+     */
     explicit StateMachine(const std::string &node_name, bool intra_process_comms = true)
         : rclcpp_lifecycle::LifecycleNode(
               node_name, rclcpp::NodeOptions().use_intra_process_comms(intra_process_comms)) {}
@@ -34,12 +69,24 @@ public:
     on_shutdown(const rclcpp_lifecycle::State &state);
 
 private:
-    // Use a lifecycle publisher
+    /**
+     * @brief ROS publisher for sending ODrive command messages.
+     */
     rclcpp_lifecycle::LifecyclePublisher<uwrt_ros_msg::msg::OdriveCmd>::SharedPtr motor_cmd_;
 
+    /**
+     * @brief List of axis identifiers used in the drivetrain system.
+     */
     std::vector<std::string> axis_id_set = {"Left", "Right"};
 
+    /**
+     * @brief Publishes an ODrive command using a ROS message.
+     * @param axis_id The ID of the axis to send the command to.
+     * @param cmd The command to be executed.
+     * @param payload Additional data for the command.
+     * @return True if the message was published successfully, false otherwise.
+     */
     bool request_odrive_cmd(const std::string &axis_id, const std::string &cmd, const std::string &payload);
 };
 
-#endif // DRIVETRAIN_H
+#endif // STATE_MACHINE_HPP_
