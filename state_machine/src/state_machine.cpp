@@ -35,6 +35,8 @@ bool StateMachine::request_odrive_cmd(const std::string &axis_id, const std::str
     auto result = motor_cmd_->async_send_request(request);
     result.wait_for(2s);
 
+    std::cout << result << std::endl;
+
     if (result.valid() && result.wait_for(2s) == std::future_status::ready) {
         RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Received response: %d", result.get()->status);
         return result.get()->status;
