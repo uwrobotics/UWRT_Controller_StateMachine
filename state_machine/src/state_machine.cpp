@@ -33,8 +33,8 @@ bool StateMachine::request_odrive_cmd(const std::string &axis_id, const std::str
     }
 
     auto future_result = motor_cmd_->async_send_request(request);
-    if (rclcpp::spin_until_future_complete(this, future_result) == rclcpp::FutureReturnCode::SUCCESS) {
-        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Sum: %d", result.get()->status);
+    if (rclcpp::spin_until_future_complete(this->get_node_base_interface(), future_result) == rclcpp::FutureReturnCode::SUCCESS) {
+        RCLCPP_INFO(rclcpp::get_logger("rclcpp"), "Sum: %d", future_result.get()->status);
         return result.get()->status;
     } else {
         RCLCPP_ERROR(rclcpp::get_logger("rclcpp"), "Failed to call service add_two_ints");
