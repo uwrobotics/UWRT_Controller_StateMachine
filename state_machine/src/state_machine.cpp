@@ -17,7 +17,7 @@ bool StateMachine::request_odrive_cmd(const std::string & axis_id,
   return true;
 }
 
-bool StateMachine::response_callback(const uwrt_ros_msg::msg::OdriveCmd & msg) const {
+bool StateMachine::response_callback(const uwrt_ros_msg::msg::MsgResponse & msg) const {
   RCLCPP_INFO(this->get_logger(), "Msg Response: %d timestamp: %s", msg.status, msg.timestamp.c_str());
 }
 

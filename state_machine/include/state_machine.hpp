@@ -79,7 +79,7 @@ private:
                           const std::string & cmd,
                           const std::string & payload);
 
-  bool response_callback(const uwrt_ros_msg::msg::OdriveCmd & msg) const;
+  bool response_callback(const uwrt_ros_msg::msg::MsgResponse & msg) const;
 };
 
 #endif  // STATE_MACHINE_HPP_
