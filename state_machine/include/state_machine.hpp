@@ -25,6 +25,15 @@
 #include "uwrt_ros_msg/msg/odrive_cmd.hpp"
 #include "uwrt_ros_msg/msg/msg_response.hpp"
 
+
+/**
+ * Todo:
+ * - add description in the message definition
+ * - if description == None
+ *  - odrive send available interface/ None
+ *  - permit to enter activate if only if available interface
+ */
+
 /**
  * @class StateMachine
  * @brief Manages the lifecycle states of the drivetrain system.
