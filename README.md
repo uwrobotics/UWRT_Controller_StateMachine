@@ -23,3 +23,9 @@ ros2 run state_machine state_machine_talker
 ros2 lifecycle set /lc_talker configure
 ros2 lifecycle set /lc_talker activate
 ```
+
+## Dependencies
+
+```bash
+pip install python-can pyserial cantools
+```
