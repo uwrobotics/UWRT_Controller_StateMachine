@@ -16,7 +16,6 @@ The odrive responsible for final conversion
 ```bash
 source ros_entrypoint.sh
 
-
 ros2 run py_odrive msg_server
 ros2 run state_machine state_machine_talker
 
@@ -27,5 +26,5 @@ ros2 lifecycle set /lc_talker activate
 ## Dependencies
 
 ```bash
-pip install python-can pyserial cantools
+pip install python-can pyserial cantools pyyaml
 ```
