@@ -11,7 +11,7 @@ find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(lifecycle_msgs REQUIRED)
 find_package(uwrt_ros_msg REQUIRED)
-find_package(nlohmann_json REQUIRED)     
+find_package(nlohmann_json REQUIRED)
 
 # Add include directory for your package's headers
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
@@ -25,7 +25,6 @@ set(SOURCE_FILE "src/state_machine.cpp")
 
 add_executable(state_machine_talker ${SOURCE_FILE} ${HEADERS})
 
-
 # Declare dependencies for ament (add other dependencies as needed)
 ament_target_dependencies(state_machine_talker
   rclcpp
@@ -34,6 +33,7 @@ ament_target_dependencies(state_machine_talker
   uwrt_ros_msg
 )
 
+# Link against nlohmann_json using the modern keyword-based syntax.
 target_link_libraries(state_machine_talker PRIVATE nlohmann_json::nlohmann_json)
 
 # Install executable
