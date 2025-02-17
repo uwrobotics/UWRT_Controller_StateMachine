@@ -34,7 +34,7 @@ ament_target_dependencies(state_machine_talker
 )
 
 # Link against nlohmann_json using the modern keyword-based syntax.
-target_link_libraries(state_machine_talker PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(state_machine_talker nlohmann_json::nlohmann_json)
 
 # Install executable
 install(TARGETS
