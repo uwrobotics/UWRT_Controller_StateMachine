@@ -22,6 +22,7 @@
 #include "rclcpp_lifecycle/lifecycle_publisher.hpp"
 
 /* Custom Message */
+#include <nlohmann/json.hpp>
 #include "uwrt_ros_msg/msg/odrive_cmd.hpp"
 #include "uwrt_ros_msg/msg/msg_response.hpp"
 

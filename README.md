@@ -12,10 +12,11 @@ This node keep the same it's just impl lifecycle as statemachine
 
 The odrive responsible for final conversion
 
-
 ```bash
-source ros_entrypoint.sh
+sudo apt-get install nlohmann-json3-dev
 
+source ros_entrypoint.sh
+source ./install/setup.bash
 ros2 run py_odrive msg_server
 ros2 run state_machine state_machine_talker
 
