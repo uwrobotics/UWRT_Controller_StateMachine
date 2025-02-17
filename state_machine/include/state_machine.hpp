@@ -77,7 +77,7 @@ private:
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr json_publisher_;
   rclcpp::Subscription<std_msgs::msg::String>::SharedPtr json_subscriber_;
 
-  std::string json_warpper(const std::string stage, const std::string type, const std::string payload) {
+  std::string json_wrapper(const std::string stage, const std::string type, const std::string payload) {
     nlohmann::json msg;
     msg["stage"] = stage;
     msg["type"] = type;

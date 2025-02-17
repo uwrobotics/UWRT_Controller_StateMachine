@@ -42,7 +42,7 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   RCLCPP_INFO(get_logger(), "on_configure() is called.");
   std::string payload = "";
   std_msgs::msg::String msg;
-  msg->data = json_wrapper("Init", "Request", payload);
+  msg.data = json_wrapper("Init", "Request", payload);
   if (motor_cmd_) {
     motor_cmd_->on_activate();
   }
