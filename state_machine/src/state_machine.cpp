@@ -41,7 +41,8 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
     "OdriveJsonPub", 10, std::bind(&StateMachine::odrive_json_callback, this, std::placeholders::_1));
   RCLCPP_INFO(get_logger(), "on_configure() is called.");
   std::string payload = "";
-  std::string msg = json_wrapper("Init", "Request", payload);
+  std_msgs::msg::String msg;
+  msg->data = json_wrapper("Init", "Request", payload);
   if (motor_cmd_) {
     motor_cmd_->on_activate();
   }
