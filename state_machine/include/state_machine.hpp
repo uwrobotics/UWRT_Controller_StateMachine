@@ -74,6 +74,8 @@ private:
 
   rclcpp::Subscription<uwrt_ros_msg::msg::MsgResponse>::SharedPtr cmd_response_;
 
+  rclcpp::Subscription<uwrt_ros_msg::msg::OdriveCmd>::SharedPtr init_response_;
+
   /// List of axis identifiers used in the drivetrain system.
   std::vector<std::string> axis_id_set_ = {"Left", "Right"};
 
@@ -84,11 +86,14 @@ private:
    * @param payload Additional command data.
    * @return True if the message was published successfully.
    */
-  bool request_odrive_cmd(const std::string & axis_id,
+  bool request_odrive_cmd(const std::string & description,
+                          const std::string & axis_id,
                           const std::string & cmd,
                           const std::string & payload);
 
   bool response_callback(const uwrt_ros_msg::msg::MsgResponse & msg) const;
+
+  void init_callback(const uwrt_ros_msg::msg::OdriveCmd & msg) const;
 };
 
 #endif  // STATE_MACHINE_HPP_

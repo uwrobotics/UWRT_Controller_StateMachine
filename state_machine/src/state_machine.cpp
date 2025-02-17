@@ -2,24 +2,30 @@
 #include "rcutils/logging_macros.h"
 
 // Publish an Odrive command message.
-bool StateMachine::request_odrive_cmd(const std::string & axis_id,
+bool StateMachine::request_odrive_cmd(const std::string & description,
+                                      const std::string & axis_id,
                                       const std::string & cmd,
                                       const std::string & payload) {
   auto msg = std::make_shared<uwrt_ros_msg::msg::OdriveCmd>();
+  msg->description = description;
   msg->axis_id = axis_id;
   msg->cmd = cmd;
   msg->payload = payload;
 
   // Publish the message (this will only send messages if the publisher is activated).
   motor_cmd_->publish(*msg);
-  RCLCPP_INFO(get_logger(), "Published OdriveCmd: axis_id='%s', cmd='%s', payload='%s'",
-              axis_id.c_str(), cmd.c_str(), payload.c_str());
+  RCLCPP_INFO(get_logger(), "Published OdriveCmd: description=%s axis_id='%s', cmd='%s', payload='%s'",
+              description.c_str(), axis_id.c_str(), cmd.c_str(), payload.c_str());
   return true;
 }
 
 bool StateMachine::response_callback(const uwrt_ros_msg::msg::MsgResponse & msg) const {
   RCLCPP_INFO(this->get_logger(), "Msg Response: %d timestamp: %s", msg.status, msg.timestamp.c_str());
   return msg.status;
+}
+
+void init_callback(const uwrt_ros_msg::msg::OdriveCmd & msg) const {
+  RCLCPP_INFO(this->get_logger(), "Msg dsecription: %s axis_id: %s", msg.description.c_str(), msg.axis_id.c_str());
 }
 
 // on_configure: Create the lifecycle publisher and send an initial message.
@@ -29,8 +35,18 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   motor_cmd_ = this->create_publisher<uwrt_ros_msg::msg::OdriveCmd>("OdriveCmd", 10);
   cmd_response_ = this->create_subscription<uwrt_ros_msg::msg::MsgResponse>(
     "MsgResponse", 10, std::bind(&StateMachine::response_callback, this, std::placeholders::_1));
+  init_response_ = this->create_subscription<uwrt_ros_msg::msg::OdriveCmd>(
+    "DeviceInit", 10, std::bind(&StateMachine::init_callback, this, std::placeholders::_1));
   RCLCPP_INFO(get_logger(), "on_configure() is called.");
-
+  if (motor_cmd_) {
+    motor_cmd_->on_activate();
+  }
+  request_odrive_cmd('None', "None",
+    "None");
+  if (motor_cmd_) {
+    motor_cmd_->on_deactivate();
+  }
+  
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
