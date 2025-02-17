@@ -24,8 +24,8 @@ bool StateMachine::response_callback(const uwrt_ros_msg::msg::MsgResponse & msg)
   return msg.status;
 }
 
-bool StateMachine::odrive_json_callback(const std_msgs::msg::String& msg) const {
-  RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.to_cstr());
+std::string StateMachine::odrive_json_callback(const std_msgs::msg::String& msg) const {
+  RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
   return msg.data;
 }
 

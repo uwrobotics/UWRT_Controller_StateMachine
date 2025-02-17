@@ -77,7 +77,7 @@ private:
   rclcpp::Publisher<std_msgs::msg::String>::SharedPtr json_publisher_;
   rclcpp::Subscription<std_msgs::msg::String>::SharedPtr json_subscriber_;
 
-  auto json_wrapper = [](const std::string stage, const std::string type, const std::string payload) -> std::string {
+  auto json_wrapper = [this](const std::string stage, const std::string type, const std::string payload) -> std::string {
     nlohmann::json msg;
     msg["stage"] = stage;
     msg["type"] = type;
@@ -99,7 +99,7 @@ private:
                           const std::string & payload);
 
   bool response_callback(const uwrt_ros_msg::msg::MsgResponse & msg) const;
-  bool odrive_json_callback(const std_msgs::msg::String& msg) const;
+  std::string odrive_json_callback(const std_msgs::msg::String& msg) const;
 };
 
 #endif  // STATE_MACHINE_HPP_
