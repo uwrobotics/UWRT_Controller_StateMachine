@@ -4,3 +4,6 @@
 [submodule "uwrt_ros_msg"]
 	path = uwrt_ros_msg
 	url = https://github.com/uwrobotics/uwrt_ros_msg.git
+[submodule "json_transport"]
+	path = json_transport
+	url = https://github.com/locusrobotics/json_transport.git
