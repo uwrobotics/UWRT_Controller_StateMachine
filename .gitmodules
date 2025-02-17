@@ -4,3 +4,6 @@
 [submodule "uwrt_ros_msg"]
 	path = uwrt_ros_msg
 	url = https://github.com/uwrobotics/uwrt_ros_msg.git
+[submodule "nlohmann_json"]
+	path = nlohmann_json
+	url = https://github.com/iaamp/nlohmann_json.git
