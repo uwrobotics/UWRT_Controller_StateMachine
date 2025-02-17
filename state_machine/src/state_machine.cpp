@@ -25,8 +25,8 @@ bool StateMachine::response_callback(const uwrt_ros_msg::msg::MsgResponse & msg)
 }
 
 bool StateMachine::odrive_json_callback(const std_msgs::msg::String& msg) const {
-  RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.string.to_cstr());
-  return msg.string;
+  RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.String.to_cstr());
+  return msg.String;
 }
 
 // on_configure: Create the lifecycle publisher and send an initial message.
@@ -43,12 +43,10 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   std::string payload = "";
   std::string msg = json_wrapper("Init", "Request", payload);
   if (motor_cmd_) {
-    json_publisher_->on_activate();
     motor_cmd_->on_activate();
   }
   json_publisher_->publish(msg);
   if (motor_cmd_) {
-    json_publisher_->on_deactivate();
     motor_cmd_->on_deactivate();
   }
   
