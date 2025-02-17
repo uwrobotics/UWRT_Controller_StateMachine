@@ -45,10 +45,13 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   msg.data = json_wrapper("Init", "Request", payload);
   if (motor_cmd_) {
     motor_cmd_->on_activate();
+    json_publisher_->on_activate();
   }
+  RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
   json_publisher_->publish(msg);
   if (motor_cmd_) {
     motor_cmd_->on_deactivate();
+    json_publisher_->on_deactivate();
   }
   
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
