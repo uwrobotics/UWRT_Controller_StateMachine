@@ -84,7 +84,7 @@ private:
     msg["payload"] = payload;
   
     return msg.dump();
-  }
+  };
 
   /**
    * @brief Publishes an Odrive command using a ROS message.
