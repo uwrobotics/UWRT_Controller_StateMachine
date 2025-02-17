@@ -41,7 +41,7 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   if (motor_cmd_) {
     motor_cmd_->on_activate();
   }
-  request_odrive_cmd('None', "None",
+  request_odrive_cmd("None", "None", "None",
     "None");
   if (motor_cmd_) {
     motor_cmd_->on_deactivate();
@@ -60,7 +60,7 @@ StateMachine::on_activate(const rclcpp_lifecycle::State &) {
   bool success = true;
   // Send a calibration command for each axis.
   for (const auto & axis : axis_id_set_) {
-    if (!request_odrive_cmd(axis, "Set_Axis_State",
+    if (!request_odrive_cmd( "a", axis, "Set_Axis_State",
                             "Axis_Requested_State: FULL_CALIBRATION_SEQUENCE;"))
     {
       RCLCPP_ERROR(get_logger(), "Request for axis %s failed", axis.c_str());
