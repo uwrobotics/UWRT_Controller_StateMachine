@@ -24,8 +24,9 @@ bool StateMachine::response_callback(const uwrt_ros_msg::msg::MsgResponse & msg)
   return msg.status;
 }
 
-void StateMachine::init_callback(const uwrt_ros_msg::msg::OdriveCmd & msg) const {
-  RCLCPP_INFO(this->get_logger(), "Msg dsecription: %s axis_id: %s", msg.description.c_str(), msg.axis_id.c_str());
+bool StateMachine::odrive_json_callback(const std_msgs::msg::String& msg) const {
+  RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.string.to_cstr());
+  return msg.string;
 }
 
 // on_configure: Create the lifecycle publisher and send an initial message.
@@ -35,15 +36,19 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   motor_cmd_ = this->create_publisher<uwrt_ros_msg::msg::OdriveCmd>("OdriveCmd", 10);
   cmd_response_ = this->create_subscription<uwrt_ros_msg::msg::MsgResponse>(
     "MsgResponse", 10, std::bind(&StateMachine::response_callback, this, std::placeholders::_1));
-  init_response_ = this->create_subscription<uwrt_ros_msg::msg::OdriveCmd>(
-    "DeviceInit", 10, std::bind(&StateMachine::init_callback, this, std::placeholders::_1));
+  json_publisher_ = this->create_publisher<std_msgs::msg::String>("OdriveJsonSub", 10);
+  json_subscriber_ = this->create_subscription<std_msgs::msg::String>(
+    "OdriveJsonPub", 10, std::bind(&StateMachine::odrive_json_callback, this, std::placeholders::_1));
   RCLCPP_INFO(get_logger(), "on_configure() is called.");
+  std::string payload = "";
+  std::string msg = json_wrapper("Init", "Request", payload);
   if (motor_cmd_) {
+    json_publisher_->on_activate();
     motor_cmd_->on_activate();
   }
-  request_odrive_cmd("None", "None", "None",
-    "None");
+  json_publisher_->publish(msg);
   if (motor_cmd_) {
+    json_publisher_->on_deactivate();
     motor_cmd_->on_deactivate();
   }
   
@@ -56,16 +61,6 @@ StateMachine::on_activate(const rclcpp_lifecycle::State &) {
   RCLCPP_INFO(get_logger(), "on_activate() is called.");
   if (motor_cmd_) {
     motor_cmd_->on_activate();
-  }
-  bool success = true;
-  // Send a calibration command for each axis.
-  for (const auto & axis : axis_id_set_) {
-    if (!request_odrive_cmd( "a", axis, "Set_Axis_State",
-                            "Axis_Requested_State: FULL_CALIBRATION_SEQUENCE;"))
-    {
-      RCLCPP_ERROR(get_logger(), "Request for axis %s failed", axis.c_str());
-      success = false;
-    }
   }
   return success ? rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS
                  : rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::FAILURE;

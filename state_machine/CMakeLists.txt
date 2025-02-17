@@ -9,9 +9,10 @@ endif()
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
-find_package(lifecycle_msgs REQUIRED)
-find_package(uwrt_ros_msg REQUIRED)
 find_package(nlohmann_json REQUIRED)
+find_package(lifecycle_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(uwrt_ros_msg REQUIRED)
 
 # Add include directory for your package's headers
 set(INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
@@ -30,6 +31,7 @@ ament_target_dependencies(state_machine_talker
   rclcpp
   rclcpp_lifecycle
   lifecycle_msgs
+  std_msgs
   uwrt_ros_msg
 )
 

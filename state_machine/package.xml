@@ -11,6 +11,7 @@
   <buildtool_depend>rosidl_default_generators</buildtool_depend>
   
   <depend>json_transport</depend>
+  <depend>std_msgs</depend>
   <depend>uwrt_ros_msg</depend>
   
   <exec_depend>rosidl_default_runtime</exec_depend>

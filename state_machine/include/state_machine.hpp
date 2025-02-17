@@ -23,6 +23,7 @@
 
 /* Custom Message */
 #include <nlohmann/json.hpp>
+#include "std_msgs/msg/string.hpp"
 #include "uwrt_ros_msg/msg/odrive_cmd.hpp"
 #include "uwrt_ros_msg/msg/msg_response.hpp"
 
@@ -72,13 +73,18 @@ public:
 private:
   /// Lifecycle publisher for OdriveCmd messages.
   rclcpp_lifecycle::LifecyclePublisher<uwrt_ros_msg::msg::OdriveCmd>::SharedPtr motor_cmd_;
-
   rclcpp::Subscription<uwrt_ros_msg::msg::MsgResponse>::SharedPtr cmd_response_;
+  rclcpp::Publisher<std_msgs::msg::String>::SharedPtr json_publisher_;
+  rclcpp::Subscription<std_msgs::msg::String>::SharedPtr json_subscriber_;
 
-  rclcpp::Subscription<uwrt_ros_msg::msg::OdriveCmd>::SharedPtr init_response_;
-
-  /// List of axis identifiers used in the drivetrain system.
-  std::vector<std::string> axis_id_set_ = {"Left", "Right"};
+  auto json_wrapper = [](const std::string stage, const std::string type, const std::string payload) -> std::string {
+    nlohmann::json msg;
+    msg["stage"] = stage;
+    msg["type"] = type;
+    msg["payload"] = payload;
+  
+    return msg.dump();
+  }
 
   /**
    * @brief Publishes an Odrive command using a ROS message.
@@ -93,8 +99,7 @@ private:
                           const std::string & payload);
 
   bool response_callback(const uwrt_ros_msg::msg::MsgResponse & msg) const;
-
-  void init_callback(const uwrt_ros_msg::msg::OdriveCmd & msg) const;
+  bool odrive_json_callback(const std_msgs::msg::String& msg) const;
 };
 
 #endif  // STATE_MACHINE_HPP_
