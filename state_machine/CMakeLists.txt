@@ -10,7 +10,6 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(rclcpp_lifecycle REQUIRED)
 find_package(lifecycle_msgs REQUIRED)
-find_package(json_transport REQUIRED)
 find_package(uwrt_ros_msg REQUIRED)     
 
 # Add include directory for your package's headers
@@ -32,7 +31,6 @@ ament_target_dependencies(state_machine_talker
   rclcpp_lifecycle
   lifecycle_msgs
   uwrt_ros_msg
-  json_transport
 )
 
 # Install executable
