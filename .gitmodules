@@ -7,3 +7,6 @@
 [submodule "json_transport"]
 	path = json_transport
 	url = https://github.com/uwrobotics/json_transport.git
+[submodule "nlohmann_json"]
+	path = nlohmann_json
+	url = https://github.com/uwrobotics/nlohmann_json.git
