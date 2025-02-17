@@ -24,7 +24,7 @@ bool StateMachine::response_callback(const uwrt_ros_msg::msg::MsgResponse & msg)
   return msg.status;
 }
 
-void init_callback(const uwrt_ros_msg::msg::OdriveCmd & msg) const {
+void StateMachine::init_callback(const uwrt_ros_msg::msg::OdriveCmd & msg) const {
   RCLCPP_INFO(this->get_logger(), "Msg dsecription: %s axis_id: %s", msg.description.c_str(), msg.axis_id.c_str());
 }
 
