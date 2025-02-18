@@ -39,7 +39,7 @@ std::string StateMachine::odrive_json_callback(const std_msgs::msg::String& msg)
   } catch (nlohmann::json::parse_error& ex) {
     // Output exception information if parsing fails
     std::cerr << "JSON Parse error: " << ex.what() << std::endl;
-    return EXIT_FAILURE;
+    return "";
   }
   return msg.data;
 }
