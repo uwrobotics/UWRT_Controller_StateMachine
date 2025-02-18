@@ -25,7 +25,22 @@ bool StateMachine::response_callback(const uwrt_ros_msg::msg::MsgResponse & msg)
 }
 
 std::string StateMachine::odrive_json_callback(const std_msgs::msg::String& msg) const {
-  RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
+  try {
+    // Parse the JSON string into a json object
+    nlohmann::json data = json::parse(msg);
+    
+    if(data.contains("Status") && data.contains("Response")) {
+      if(data["Status"] == "Init", data["Response"] == "Success") {
+        cali_complete = true;
+      }
+    }
+
+    RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
+  } catch (json::parse_error& ex) {
+    // Output exception information if parsing fails
+    std::cerr << "JSON Parse error: " << ex.what() << std::endl;
+    return EXIT_FAILURE;
+  }
   return msg.data;
 }
 
@@ -45,14 +60,15 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   std_msgs::msg::String msg;
   msg.data = json_wrapper("Init", "Request", payload);
   if (motor_cmd_) {
-    motor_cmd_->on_activate();
     json_publisher_->on_activate();
   }
-  RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
-  json_publisher_->publish(msg);
+  while(cali_complete == false) {
+    RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
+    json_publisher_->publish(msg);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
   // implement a mutex msg box 
   if (motor_cmd_) {
-    motor_cmd_->on_deactivate();
     json_publisher_->on_deactivate();
   }
   motor_cmd_ = this->create_publisher<uwrt_ros_msg::msg::OdriveCmd>("OdriveCmd", 10);

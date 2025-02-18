@@ -89,6 +89,8 @@ private:
     return msg.dump();
   };
 
+  bool cali_complete = false;
+  
   /**
    * @brief Publishes an Odrive command using a ROS message.
    * @param axis_id The ID of the axis.
