@@ -59,7 +59,7 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   std::string payload = "";
   std_msgs::msg::String msg;
   msg.data = json_wrapper("Init", "Request", payload);
-  if (motor_cmd_) {
+  if (json_publisher_) {
     json_publisher_->on_activate();
   }
   while(cali_complete == false) {
@@ -68,7 +68,7 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
   // implement a mutex msg box 
-  if (motor_cmd_) {
+  if (json_publisher_) {
     json_publisher_->on_deactivate();
   }
   motor_cmd_ = this->create_publisher<uwrt_ros_msg::msg::OdriveCmd>("OdriveCmd", 10);
