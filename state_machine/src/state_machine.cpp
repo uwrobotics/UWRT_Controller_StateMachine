@@ -27,7 +27,7 @@ bool StateMachine::response_callback(const uwrt_ros_msg::msg::MsgResponse & msg)
 std::string StateMachine::odrive_json_callback(const std_msgs::msg::String& msg){
   try {
     // Parse the JSON string into a json object
-    nlohmann::json data = nlohmann::json::parse(msg);
+    nlohmann::json data = nlohmann::json::parse(msg.data);
     
     if(data.contains("Status") && data.contains("Response")) {
       if(data["Status"] == "Init", data["Response"] == "Success") {
