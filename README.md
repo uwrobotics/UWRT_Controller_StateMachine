@@ -13,6 +13,10 @@ This node keep the same it's just impl lifecycle as statemachine
 The odrive responsible for final conversion
 
 ```bash
+sudo docker build . -t statemachine   
+
+sudo docker run -it --net host statemachine 
+
 sudo apt-get install nlohmann-json3-dev
 
 source ros_entrypoint.sh

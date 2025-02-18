@@ -23,3 +23,5 @@ RUN mkdir -p ~/ros2_ws \
 RUN . /opt/ros/galactic/setup.sh \
     && apt-get update \
     && apt-get install nlohmann-json3-dev \
+    && cd ~/ros2_ws \
+    && colcon build 
