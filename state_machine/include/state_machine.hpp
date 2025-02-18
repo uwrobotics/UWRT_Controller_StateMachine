@@ -90,7 +90,7 @@ private:
   };
 
   bool cali_complete = false;
-  
+
   /**
    * @brief Publishes an Odrive command using a ROS message.
    * @param axis_id The ID of the axis.
@@ -104,7 +104,7 @@ private:
                           const std::string & payload);
 
   bool response_callback(const uwrt_ros_msg::msg::MsgResponse & msg) const;
-  std::string odrive_json_callback(const std_msgs::msg::String& msg) const;
+  std::string odrive_json_callback(const std_msgs::msg::String& msg);
   void joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg) const;
 };
 

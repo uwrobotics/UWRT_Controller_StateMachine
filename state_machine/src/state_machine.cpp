@@ -24,10 +24,10 @@ bool StateMachine::response_callback(const uwrt_ros_msg::msg::MsgResponse & msg)
   return msg.status;
 }
 
-std::string StateMachine::odrive_json_callback(const std_msgs::msg::String& msg) const {
+std::string StateMachine::odrive_json_callback(const std_msgs::msg::String& msg){
   try {
     // Parse the JSON string into a json object
-    nlohmann::json data = json::parse(msg);
+    nlohmann::json data = nlohmann::json::parse(msg);
     
     if(data.contains("Status") && data.contains("Response")) {
       if(data["Status"] == "Init", data["Response"] == "Success") {
@@ -36,7 +36,7 @@ std::string StateMachine::odrive_json_callback(const std_msgs::msg::String& msg)
     }
 
     RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
-  } catch (json::parse_error& ex) {
+  } catch (nlohmann::json::parse_error& ex) {
     // Output exception information if parsing fails
     std::cerr << "JSON Parse error: " << ex.what() << std::endl;
     return EXIT_FAILURE;
