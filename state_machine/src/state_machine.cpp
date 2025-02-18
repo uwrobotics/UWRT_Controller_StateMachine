@@ -29,13 +29,14 @@ std::string StateMachine::odrive_json_callback(const std_msgs::msg::String& msg)
   return msg.data;
 }
 
+void StateMachine::joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg) const {
+  RCLCPP_INFO(this->get_logger(), "Received joint state message with %zu joints", msg->name.size());
+}
+
 // on_configure: Create the lifecycle publisher and send an initial message.
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
 StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   // Create a lifecycle publisher with a QoS depth of 10.
-  motor_cmd_ = this->create_publisher<uwrt_ros_msg::msg::OdriveCmd>("OdriveCmd", 10);
-  cmd_response_ = this->create_subscription<uwrt_ros_msg::msg::MsgResponse>(
-    "MsgResponse", 10, std::bind(&StateMachine::response_callback, this, std::placeholders::_1));
   json_publisher_ = this->create_publisher<std_msgs::msg::String>("OdriveJsonSub", 10);
   json_subscriber_ = this->create_subscription<std_msgs::msg::String>(
     "OdriveJsonPub", 10, std::bind(&StateMachine::odrive_json_callback, this, std::placeholders::_1));
@@ -49,11 +50,17 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   }
   RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
   json_publisher_->publish(msg);
+  // implement a mutex msg box 
   if (motor_cmd_) {
     motor_cmd_->on_deactivate();
     json_publisher_->on_deactivate();
   }
-  
+  motor_cmd_ = this->create_publisher<uwrt_ros_msg::msg::OdriveCmd>("OdriveCmd", 10);
+  cmd_response_ = this->create_subscription<uwrt_ros_msg::msg::MsgResponse>(
+    "MsgResponse", 10, std::bind(&StateMachine::response_callback, this, std::placeholders::_1));
+  joint_state_subscriber_ = this->create_subscription<sensor_msgs::msg::JointState>(
+    "/joint_states",
+    10, std::bind(&StateMachine::joint_state_callback, this, std::placeholders::_1));
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 

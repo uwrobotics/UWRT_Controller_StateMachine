@@ -23,6 +23,7 @@
 
 /* Custom Message */
 #include <nlohmann/json.hpp>
+#include "sensor_msgs/msg/joint_state.hpp"
 #include "std_msgs/msg/string.hpp"
 #include "uwrt_ros_msg/msg/odrive_cmd.hpp"
 #include "uwrt_ros_msg/msg/msg_response.hpp"
@@ -76,6 +77,8 @@ private:
   rclcpp::Subscription<uwrt_ros_msg::msg::MsgResponse>::SharedPtr cmd_response_;
   rclcpp_lifecycle::LifecyclePublisher<std_msgs::msg::String>::SharedPtr json_publisher_;
   rclcpp::Subscription<std_msgs::msg::String>::SharedPtr json_subscriber_;
+
+  rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_subscriber_;
 
   std::string json_wrapper(const std::string stage, const std::string type, const std::string payload) {
     nlohmann::json msg;
