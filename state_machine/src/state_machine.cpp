@@ -59,7 +59,7 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   cmd_response_ = this->create_subscription<uwrt_ros_msg::msg::MsgResponse>(
     "MsgResponse", 10, std::bind(&StateMachine::response_callback, this, std::placeholders::_1));
   joint_state_subscriber_ = this->create_subscription<sensor_msgs::msg::JointState>(
-    "/joint_states",
+    "joint_states",
     10, std::bind(&StateMachine::joint_state_callback, this, std::placeholders::_1));
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
