@@ -103,7 +103,7 @@ private:
 
   bool response_callback(const uwrt_ros_msg::msg::MsgResponse & msg) const;
   std::string odrive_json_callback(const std_msgs::msg::String& msg) const;
-  void StateMachine::joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg) const;
+  void joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg) const;
 };
 
 #endif  // STATE_MACHINE_HPP_
