@@ -9,19 +9,23 @@ RUN apt-get update && apt-get install -y \
 # Copy your ROS2 workspace into the container.
 # This assumes your package (and the launch folder) is in the current directory.
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 # Set the working directory
 RUN mkdir -p ~/ros2_ws \
     && cd ~/ros2_ws \
     && git clone https://github.com/uwrobotics/UWRT_Controller_StateMachine.git -b y29lin/device-config \
     && cd UWRT_Controller_StateMachine \
     && git submodule init \
-    && git submodule update --recursive \
-    && cd ~/ros2_ws
+    && git submodule update --recursive
 
 
 # Build the workspace
 RUN . /opt/ros/galactic/setup.sh \
     && apt-get update \
-    && apt-get install nlohmann-json3-dev \
+    && apt-get install -y nlohmann-json3-dev \
+    && apt-get install -y python3-pip \
+    && pip install python-can cantools \
+    && apt-get clean && rm -rf /var/lib/apt/lists/* \
     && cd ~/ros2_ws \
     && colcon build 
