@@ -106,7 +106,7 @@ private:
     return j.dump();
   };
 
-  std::string json_speed_wrapper(const std::string stage, const std::string type, const std::string target, const std::string command, const std::string axis_one, const std::string axis_two, const std::string axis_three, const std::string axis_four, const std::string axis_five, const std::string axis_six) {
+  std::string json_speed_wrapper(const std::string stage, const std::string type, const std::string target, const std::string command, std::string axis_one, std::string axis_two, std::string axis_three, std::string axis_four, std::string axis_five, std::string axis_six) {
     nlohmann::json j;
     j["Stage"] = stage;
     j["Type"] = type;
