@@ -49,8 +49,7 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   json_publisher_->publish(msg);
   while (!cali_complete) {}
   cali_complete = false;
-  std::string payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "CLOSE_LOOP_CONTROL");
-  std_msgs::msg::String msg;
+  payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "CLOSE_LOOP_CONTROL");
   msg.data = payload;
   RCLCPP_INFO(this->get_logger(), "Publishing: %s", msg.data.c_str());
   json_publisher_->publish(msg);
