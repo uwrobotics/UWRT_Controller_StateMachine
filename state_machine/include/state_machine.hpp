@@ -108,7 +108,7 @@ private:
 
   bool cali_complete = false;
 
-  void odrive_json_callback(const std_msgs::msg::String& msg);
+  void odrive_json_callback(const std_msgs::msg::String& msg) const;
   void joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg) const;
 };
 

@@ -12,7 +12,7 @@ void StateMachine::joint_state_callback(const sensor_msgs::msg::JointState::Shar
   double right_speed = msg->velocity[1];
 }
 
-void StateMachine::odrive_json_callback(const std_msgs::msg::String& msg){
+void StateMachine::odrive_json_callback(const std_msgs::msg::String& msg) const{
   std::cout << "here" << std::endl;
   try {
     // Parse the JSON string into a json object
@@ -42,23 +42,18 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   if (json_publisher_) {
     json_publisher_->on_activate();
   }
-  while(cali_complete == false) {
-    std::string payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "FULL_CALIBRATION_SEQUENCE");
-    std_msgs::msg::String msg;
-    msg.data = payload;
-    RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
-    json_publisher_->publish(msg);
+  std::string payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "FULL_CALIBRATION_SEQUENCE");
+  std_msgs::msg::String msg;
+  msg.data = payload;
+  RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
+  json_publisher_->publish(msg);
+  //std::this_thread::sleep_for(std::chrono::seconds(1));
+  std::string payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "CLOSED_LOOP_CONTROL");
+  std_msgs::msg::String msg;
+  msg.data = payload;
+  RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
+  json_publisher_->publish(msg);
     //std::this_thread::sleep_for(std::chrono::seconds(1));
-  }
-  cali_complete = false;
-  while(cali_complete == false) {
-    std::string payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "CLOSED_LOOP_CONTROL");
-    std_msgs::msg::String msg;
-    msg.data = payload;
-    RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
-    json_publisher_->publish(msg);
-    //std::this_thread::sleep_for(std::chrono::seconds(1));
-  }
   // implement a mutex msg box 
   if (json_publisher_) {
     json_publisher_->on_deactivate();
