@@ -76,6 +76,8 @@ private:
 
   rclcpp::Subscription<sensor_msgs::msg::JointState>::SharedPtr joint_state_subscriber_;
 
+  rclcpp::TimerBase::SharedPtr calibration_timer_;
+
   std::string json_wrapper(const std::string stage, const std::string type, const std::string payload) {
     nlohmann::json msg;
     msg["stage"] = stage;
