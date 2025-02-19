@@ -13,6 +13,7 @@ void StateMachine::joint_state_callback(const sensor_msgs::msg::JointState::Shar
 }
 
 void StateMachine::odrive_json_callback(const std_msgs::msg::String& msg){
+  std::cout << "here" << std::endl;
   try {
     // Parse the JSON string into a json object
     nlohmann::json data = nlohmann::json::parse(msg.data);
@@ -41,19 +42,23 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   if (json_publisher_) {
     json_publisher_->on_activate();
   }
-  // You can alternate between two types of messages or use separate timers.
-  std::string payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "FULL_CALIBRATION_SEQUENCE");
-  std_msgs::msg::String msg;
-  msg.data = payload;
-  RCLCPP_INFO(this->get_logger(), "Publishing: %s", msg.data.c_str());
-  json_publisher_->publish(msg);
-  while (!cali_complete) {}
+  while(cali_complete == false) {
+    std::string payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "FULL_CALIBRATION_SEQUENCE");
+    std_msgs::msg::String msg;
+    msg.data = payload;
+    RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
+    json_publisher_->publish(msg);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
   cali_complete = false;
-  payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "CLOSE_LOOP_CONTROL");
-  msg.data = payload;
-  RCLCPP_INFO(this->get_logger(), "Publishing: %s", msg.data.c_str());
-  json_publisher_->publish(msg);
-  while (!cali_complete) {}
+  while(cali_complete == false) {
+    std::string payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "CLOSED_LOOP_CONTROL");
+    std_msgs::msg::String msg;
+    msg.data = payload;
+    RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
+    json_publisher_->publish(msg);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
   // implement a mutex msg box 
   if (json_publisher_) {
     json_publisher_->on_deactivate();
