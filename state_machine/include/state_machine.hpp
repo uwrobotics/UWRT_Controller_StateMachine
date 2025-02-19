@@ -115,9 +115,6 @@ private:
     
     // Create the Payload object with keys "1" to "6"
     nlohmann::json payload;
-    for (int i = 1; i <= 6; ++i) {
-      payload[std::to_string(i)] = payload_msg;
-    }
     payload[std::to_string(1)] = axis_one;
     payload[std::to_string(2)] = axis_two;
     payload[std::to_string(3)] = axis_three;
