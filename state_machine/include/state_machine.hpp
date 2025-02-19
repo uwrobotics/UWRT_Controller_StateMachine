@@ -93,7 +93,7 @@ private:
     j["Command"] = command;
     
     // Create the Payload object with keys "1" to "6"
-    json payload;
+    nlohmann::json payload;
     for (int i = 1; i <= 6; ++i) {
       payload[std::to_string(i)] = payload_msg;
     }
