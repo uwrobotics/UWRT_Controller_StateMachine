@@ -1,7 +1,7 @@
 #include "state_machine.hpp"
 #include "rcutils/logging_macros.h"
 
-void StateMachine::joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg) const {
+void StateMachine::joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg) {
   if (msg->velocity.size() < 2) {
     RCLCPP_WARN(this->get_logger(), "Received JointState with less than two velocity values.");
     return;
