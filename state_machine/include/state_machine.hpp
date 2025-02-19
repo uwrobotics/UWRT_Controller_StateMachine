@@ -106,6 +106,31 @@ private:
     return j.dump();
   };
 
+  std::string json_speed_wrapper(const std::string stage, const std::string type, const std::string target, const std::string command, const std::string axis_one, const std::string axis_two, const std::string axis_three, const std::string axis_four, const std::string axis_five, const std::string axis_six) {
+    nlohmann::json j;
+    j["Stage"] = stage;
+    j["Type"] = type;
+    j["Target"] = target;
+    j["Command"] = command;
+    
+    // Create the Payload object with keys "1" to "6"
+    nlohmann::json payload;
+    for (int i = 1; i <= 6; ++i) {
+      payload[std::to_string(i)] = payload_msg;
+    }
+    payload[std::to_string(1)] = axis_one;
+    payload[std::to_string(2)] = axis_two;
+    payload[std::to_string(3)] = axis_three;
+    payload[std::to_string(4)] = axis_four;
+    payload[std::to_string(5)] = axis_five;
+    payload[std::to_string(6)] = axis_six;
+    
+    j["Payload"] = payload;
+    
+    // Convert the JSON object to a string (minified version)
+    return j.dump();
+  };
+
   bool cali_complete = false;
 
   void odrive_json_callback(const std_msgs::msg::String& msg) const;

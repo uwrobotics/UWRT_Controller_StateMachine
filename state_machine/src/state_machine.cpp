@@ -10,6 +10,11 @@ void StateMachine::joint_state_callback(const sensor_msgs::msg::JointState::Shar
   // Assume first velocity is left motor, second is right motor.
   double left_speed  = msg->velocity[0];
   double right_speed = msg->velocity[1];
+  std::string payload = json_speed_wrapper("Activate", "request", "Drivetrain", "Set_Input_Vel", std::to_string(left_speed),std::to_string(left_speed), std::to_string(left_speed),std::to_string(right_speed),std::to_string(right_speed),std::to_string(right_speed));
+  std_msgs::msg::String msg;
+  msg.data = payload;
+  RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
+  json_publisher_->publish(msg);
 }
 
 void StateMachine::odrive_json_callback(const std_msgs::msg::String& msg) const{
