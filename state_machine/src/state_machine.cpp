@@ -38,26 +38,23 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   json_subscriber_ = this->create_subscription<std_msgs::msg::String>(
     "OdriveJsonPub", 10, std::bind(&StateMachine::odrive_json_callback, this, std::placeholders::_1));
   RCLCPP_INFO(get_logger(), "on_configure() is called.");
-  std::string payload = "";
-  std_msgs::msg::String msg;
-  msg.data = json_wrapper("Init", "Request", payload);
   if (json_publisher_) {
     json_publisher_->on_activate();
   }
   while(cali_complete == false) {
-    RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
     std::string payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "FULL_CALIBRATION_SEQUENCE");
     std_msgs::msg::String msg;
     msg.data = payload;
+    RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
     json_publisher_->publish(msg);
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
   cali_complete = false;
   while(cali_complete == false) {
-    RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
     std::string payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "CLOSED_LOOP_CONTROL");
     std_msgs::msg::String msg;
     msg.data = payload;
+    RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
     json_publisher_->publish(msg);
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
