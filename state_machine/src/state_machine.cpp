@@ -79,7 +79,7 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   }
   joint_state_subscriber_ = this->create_subscription<sensor_msgs::msg::JointState>(
     "joint_states", 10,
-    std::bind(&JointStateToTwistConverter::joint_state_callback, this, std::placeholders::_1));
+    std::bind(&StateMachine::joint_state_callback, this, std::placeholders::_1));
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
