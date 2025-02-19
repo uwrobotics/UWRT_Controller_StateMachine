@@ -49,7 +49,7 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   }
   while(cali_complete == false) {
     RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
-    std::string payload = "{"Stage": "Calibration", "Type": "request", "Target": "Drivetrain", "Command": "Set_Axis_State", "Payload": {"1": "FULL_CALIBRATION_SEQUENCE", "2": "FULL_CALIBRATION_SEQUENCE", "3": "FULL_CALIBRATION_SEQUENCE", "4": "FULL_CALIBRATION_SEQUENCE", "5": "FULL_CALIBRATION_SEQUENCE", "6": "FULL_CALIBRATION_SEQUENCE"}}"
+    std::string payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "FULL_CALIBRATION_SEQUENCE")
     std_msgs::msg::String msg;
     msg.data = payload;
     json_publisher_->publish(msg);
@@ -58,16 +58,7 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   cali_complete = false;
   while(cali_complete == false) {
     RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
-    std::string payload = "{"Stage": "Calibration", "Type": "request", "Target": "Drivetrain", "Command": "Set_Axis_State", "Payload": {"1": "CLOSED_LOOP_CONTROL", "2": "CLOSED_LOOP_CONTROL", "3": "CLOSED_LOOP_CONTROL", "4": "CLOSED_LOOP_CONTROL", "5": "CLOSED_LOOP_CONTROL", "6": "CLOSED_LOOP_CONTROL"}}"
-    std_msgs::msg::String msg;
-    msg.data = payload;
-    json_publisher_->publish(msg);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-  }
-  cali_complete = false;
-  while(cali_complete == false) {
-    RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
-    std::string payload = "{"Stage": "Calibration", "Type": "request", "Target": "Drivetrain", "Command": "Set_Controller_Mode", "Payload": {"1": {"control_mode": "VELOCITY_CONTROL", "input_mode": "VEL_RAMP"}, "2": {"control_mode": "VELOCITY_CONTROL", "input_mode": "VEL_RAMP"}, "3": {"control_mode": "VELOCITY_CONTROL", "input_mode": "VEL_RAMP"}, "4": {"control_mode": "VELOCITY_CONTROL", "input_mode": "VEL_RAMP"}, "5": {"control_mode": "VELOCITY_CONTROL", "input_mode": "VEL_RAMP"}, "6": {"control_mode": "VELOCITY_CONTROL", "input_mode": "VEL_RAMP"}}}"
+    std::string payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "CLOSED_LOOP_CONTROL")
     std_msgs::msg::String msg;
     msg.data = payload;
     json_publisher_->publish(msg);

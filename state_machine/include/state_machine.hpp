@@ -85,6 +85,25 @@ private:
     return msg.dump();
   };
 
+  std::string json_request_wrapper(const std::string stage, const std::string type, const std::string target, const std::string command, const std::string payload_msg) {
+    nlohmann::json j;
+    j["Stage"] = stage;
+    j["Type"] = type;
+    j["Target"] = target;
+    j["Command"] = command;
+    
+    // Create the Payload object with keys "1" to "6"
+    json payload;
+    for (int i = 1; i <= 6; ++i) {
+      payload[std::to_string(i)] = payload_msg;
+    }
+    
+    j["Payload"] = payload;
+    
+    // Convert the JSON object to a string (minified version)
+    return j.dump();
+  }
+
   bool cali_complete = false;
 
   void odrive_json_callback(const std_msgs::msg::String& msg);
