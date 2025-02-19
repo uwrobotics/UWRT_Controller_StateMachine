@@ -106,7 +106,6 @@ StateMachine::on_deactivate(const rclcpp_lifecycle::State &) {
 // on_cleanup: Clean up the publisher.
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
 StateMachine::on_cleanup(const rclcpp_lifecycle::State &) {
-  motor_cmd_.reset();
   RCLCPP_INFO(get_logger(), "on_cleanup() is called.");
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -114,7 +113,7 @@ StateMachine::on_cleanup(const rclcpp_lifecycle::State &) {
 // on_shutdown: Shut down the node.
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
 StateMachine::on_shutdown(const rclcpp_lifecycle::State & state) {
-  motor_cmd_.reset();
+  // motor_cmd_.reset();
   RCLCPP_INFO(get_logger(), "on_shutdown() is called from state %s.", state.label().c_str());
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
