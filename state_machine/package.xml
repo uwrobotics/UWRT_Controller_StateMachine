@@ -12,7 +12,6 @@
   
   <depend>json_transport</depend>
   <depend>std_msgs</depend>
-  <depend>uwrt_ros_msg</depend>
   <depend>sensor_msgs</depend>
   
   <exec_depend>rosidl_default_runtime</exec_depend>

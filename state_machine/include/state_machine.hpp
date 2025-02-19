@@ -25,8 +25,6 @@
 #include <nlohmann/json.hpp>
 #include "sensor_msgs/msg/joint_state.hpp"
 #include "std_msgs/msg/string.hpp"
-#include "uwrt_ros_msg/msg/odrive_cmd.hpp"
-#include "uwrt_ros_msg/msg/msg_response.hpp"
 
 
 /**

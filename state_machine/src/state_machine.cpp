@@ -1,6 +1,19 @@
 #include "state_machine.hpp"
 #include "rcutils/logging_macros.h"
 
+void joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg) const {
+  if (msg->velocity.size() < 2) {
+    RCLCPP_WARN(this->get_logger(), "Received JointState with less than two velocity values.");
+    return;
+  }
+
+  // Assume first velocity is left motor, second is right motor.
+  double left_speed  = msg->velocity[0];
+  double right_speed = msg->velocity[1];
+
+
+}
+
 std::string StateMachine::odrive_json_callback(const std_msgs::msg::String& msg){
   try {
     // Parse the JSON string into a json object
@@ -65,6 +78,9 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   if (json_publisher_) {
     json_publisher_->on_deactivate();
   }
+  joint_state_subscriber_ = this->create_subscription<sensor_msgs::msg::JointState>(
+    "joint_states", 10,
+    std::bind(&JointStateToTwistConverter::joint_state_callback, this, std::placeholders::_1));
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 

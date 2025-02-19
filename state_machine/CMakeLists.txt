@@ -12,7 +12,6 @@ find_package(rclcpp_lifecycle REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(lifecycle_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
-find_package(uwrt_ros_msg REQUIRED)
 find_package(sensor_msgs REQUIRED)
 
 # Add include directory for your package's headers
@@ -34,7 +33,6 @@ ament_target_dependencies(state_machine_talker
   lifecycle_msgs
   std_msgs
   sensor_msgs
-  uwrt_ros_msg
 )
 
 # Link against nlohmann_json using the modern keyword-based syntax.
