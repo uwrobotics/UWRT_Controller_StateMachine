@@ -20,7 +20,7 @@ void StateMachine::odrive_json_callback(const std_msgs::msg::String& msg) const{
     std::cout << msg.data << std::endl;
     if(data.contains("Payload")) {
       if(data["Payload"] == "Success") {
-        cali_complete = true;
+        std::cout << "Success" << std::endl;
       }
     }
 
