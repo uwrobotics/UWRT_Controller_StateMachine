@@ -1,7 +1,7 @@
 #include "state_machine.hpp"
 #include "rcutils/logging_macros.h"
 
-void joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg) const {
+void StateMachine::joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg) const {
   if (msg->velocity.size() < 2) {
     RCLCPP_WARN(this->get_logger(), "Received JointState with less than two velocity values.");
     return;
@@ -10,8 +10,6 @@ void joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg) con
   // Assume first velocity is left motor, second is right motor.
   double left_speed  = msg->velocity[0];
   double right_speed = msg->velocity[1];
-
-
 }
 
 void StateMachine::odrive_json_callback(const std_msgs::msg::String& msg){
@@ -29,7 +27,6 @@ void StateMachine::odrive_json_callback(const std_msgs::msg::String& msg){
   } catch (nlohmann::json::parse_error& ex) {
     // Output exception information if parsing fails
     std::cerr << "JSON Parse error: " << ex.what() << std::endl;
-    return "";
   }
 }
 
