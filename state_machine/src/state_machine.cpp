@@ -6,6 +6,9 @@ void StateMachine::joint_state_callback(const sensor_msgs::msg::JointState::Shar
     RCLCPP_WARN(this->get_logger(), "Received JointState with less than two velocity values.");
     return;
   }
+  if (json_publisher_) {
+    json_publisher_->on_activate();
+  }
 
   // Assume first velocity is left motor, second is right motor.
   double left_speed  = msg->velocity[0];
@@ -15,6 +18,9 @@ void StateMachine::joint_state_callback(const sensor_msgs::msg::JointState::Shar
   pub_msg.data = payload;
   RCLCPP_INFO(this->get_logger(), "Msg Response: %s", pub_msg.data.c_str());
   json_publisher_->publish(pub_msg);
+  if (json_publisher_) {
+    json_publisher_->on_deactivate();
+  }
 }
 
 void StateMachine::odrive_json_callback(const std_msgs::msg::String& msg) const{
