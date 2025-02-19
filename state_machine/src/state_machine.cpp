@@ -41,41 +41,20 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   if (json_publisher_) {
     json_publisher_->on_activate();
   }
-  calibration_timer_ = this->create_wall_timer(
-    std::chrono::seconds(1),
-    [this]() {
-      // Check if calibration is complete.
-      if (!cali_complete) {
-        // You can alternate between two types of messages or use separate timers.
-        std::string payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "FULL_CALIBRATION_SEQUENCE");
-        std_msgs::msg::String msg;
-        msg.data = payload;
-        RCLCPP_INFO(this->get_logger(), "Publishing: %s", msg.data.c_str());
-        json_publisher_->publish(msg);
-      } else {
-        // Calibration is complete; cancel the timer.
-        RCLCPP_INFO(this->get_logger(), "Calibration complete, stopping publisher timer.");
-        calibration_timer_->cancel();
-      }
-    });
+  // You can alternate between two types of messages or use separate timers.
+  std::string payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "FULL_CALIBRATION_SEQUENCE");
+  std_msgs::msg::String msg;
+  msg.data = payload;
+  RCLCPP_INFO(this->get_logger(), "Publishing: %s", msg.data.c_str());
+  json_publisher_->publish(msg);
+  while (!cali_complete) {}
   cali_complete = false;
-  calibration_timer_ = this->create_wall_timer(
-    std::chrono::seconds(1),
-    [this]() {
-      // Check if calibration is complete.
-      if (!cali_complete) {
-        // You can alternate between two types of messages or use separate timers.
-        std::string payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "CLOSE_LOOP_CONTROL");
-        std_msgs::msg::String msg;
-        msg.data = payload;
-        RCLCPP_INFO(this->get_logger(), "Publishing: %s", msg.data.c_str());
-        json_publisher_->publish(msg);
-      } else {
-        // Calibration is complete; cancel the timer.
-        RCLCPP_INFO(this->get_logger(), "Calibration complete, stopping publisher timer.");
-        calibration_timer_->cancel();
-      }
-    });
+  std::string payload = json_request_wrapper("Calibration", "request", "Drivetrain", "Set_Axis_State", "CLOSE_LOOP_CONTROL");
+  std_msgs::msg::String msg;
+  msg.data = payload;
+  RCLCPP_INFO(this->get_logger(), "Publishing: %s", msg.data.c_str());
+  json_publisher_->publish(msg);
+  while (!cali_complete) {}
   // implement a mutex msg box 
   if (json_publisher_) {
     json_publisher_->on_deactivate();
