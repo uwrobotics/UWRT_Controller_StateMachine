@@ -48,7 +48,7 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
     msg.data = payload;
     RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
     json_publisher_->publish(msg);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    //std::this_thread::sleep_for(std::chrono::seconds(1));
   }
   cali_complete = false;
   while(cali_complete == false) {
@@ -57,7 +57,7 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
     msg.data = payload;
     RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
     json_publisher_->publish(msg);
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    //std::this_thread::sleep_for(std::chrono::seconds(1));
   }
   // implement a mutex msg box 
   if (json_publisher_) {
