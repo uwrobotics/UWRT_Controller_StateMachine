@@ -14,7 +14,7 @@ void joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg) con
 
 }
 
-std::string StateMachine::odrive_json_callback(const std_msgs::msg::String& msg){
+void StateMachine::odrive_json_callback(const std_msgs::msg::String& msg){
   try {
     // Parse the JSON string into a json object
     nlohmann::json data = nlohmann::json::parse(msg.data);
@@ -31,7 +31,6 @@ std::string StateMachine::odrive_json_callback(const std_msgs::msg::String& msg)
     std::cerr << "JSON Parse error: " << ex.what() << std::endl;
     return "";
   }
-  return msg.data;
 }
 
 // on_configure: Create the lifecycle publisher and send an initial message.
