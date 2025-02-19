@@ -16,7 +16,7 @@ void StateMachine::odrive_json_callback(const std_msgs::msg::String& msg){
   try {
     // Parse the JSON string into a json object
     nlohmann::json data = nlohmann::json::parse(msg.data);
-    
+    std::cout << msg.data << std::endl;
     if(data.contains("Payload")) {
       if(data["Payload"] == "Success") {
         cali_complete = true;
