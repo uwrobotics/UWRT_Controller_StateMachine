@@ -102,7 +102,7 @@ private:
     
     // Convert the JSON object to a string (minified version)
     return j.dump();
-  }
+  };
 
   bool cali_complete = false;
 
