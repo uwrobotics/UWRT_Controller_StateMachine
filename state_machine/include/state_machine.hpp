@@ -73,8 +73,6 @@ public:
 
 private:
   /// Lifecycle publisher for OdriveCmd messages.
-  rclcpp_lifecycle::LifecyclePublisher<uwrt_ros_msg::msg::OdriveCmd>::SharedPtr motor_cmd_;
-  rclcpp::Subscription<uwrt_ros_msg::msg::MsgResponse>::SharedPtr cmd_response_;
   rclcpp_lifecycle::LifecyclePublisher<std_msgs::msg::String>::SharedPtr json_publisher_;
   rclcpp::Subscription<std_msgs::msg::String>::SharedPtr json_subscriber_;
 

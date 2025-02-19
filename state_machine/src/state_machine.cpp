@@ -1,36 +1,13 @@
 #include "state_machine.hpp"
 #include "rcutils/logging_macros.h"
 
-// Publish an Odrive command message.
-bool StateMachine::request_odrive_cmd(const std::string & description,
-                                      const std::string & axis_id,
-                                      const std::string & cmd,
-                                      const std::string & payload) {
-  auto msg = std::make_shared<uwrt_ros_msg::msg::OdriveCmd>();
-  msg->description = description;
-  msg->axis_id = axis_id;
-  msg->cmd = cmd;
-  msg->payload = payload;
-
-  // Publish the message (this will only send messages if the publisher is activated).
-  motor_cmd_->publish(*msg);
-  RCLCPP_INFO(get_logger(), "Published OdriveCmd: description=%s axis_id='%s', cmd='%s', payload='%s'",
-              description.c_str(), axis_id.c_str(), cmd.c_str(), payload.c_str());
-  return true;
-}
-
-bool StateMachine::response_callback(const uwrt_ros_msg::msg::MsgResponse & msg) const {
-  RCLCPP_INFO(this->get_logger(), "Msg Response: %d timestamp: %s", msg.status, msg.timestamp.c_str());
-  return msg.status;
-}
-
 std::string StateMachine::odrive_json_callback(const std_msgs::msg::String& msg){
   try {
     // Parse the JSON string into a json object
     nlohmann::json data = nlohmann::json::parse(msg.data);
     
-    if(data.contains("Status") && data.contains("Response")) {
-      if(data["Status"] == "Init", data["Response"] == "Success") {
+    if(data.contains("Payload")) {
+      if(data["Payload"] == "Success") {
         cali_complete = true;
       }
     }
@@ -42,10 +19,6 @@ std::string StateMachine::odrive_json_callback(const std_msgs::msg::String& msg)
     return "";
   }
   return msg.data;
-}
-
-void StateMachine::joint_state_callback(const sensor_msgs::msg::JointState::SharedPtr msg) const {
-  RCLCPP_INFO(this->get_logger(), "Received joint state message with %zu joints", msg->name.size());
 }
 
 // on_configure: Create the lifecycle publisher and send an initial message.
@@ -64,6 +37,27 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   }
   while(cali_complete == false) {
     RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
+    std::string payload = "{"Stage": "Calibration", "Type": "request", "Target": "Drivetrain", "Command": "Set_Axis_State", "Payload": {"1": "FULL_CALIBRATION_SEQUENCE", "2": "FULL_CALIBRATION_SEQUENCE", "3": "FULL_CALIBRATION_SEQUENCE", "4": "FULL_CALIBRATION_SEQUENCE", "5": "FULL_CALIBRATION_SEQUENCE", "6": "FULL_CALIBRATION_SEQUENCE"}}"
+    std_msgs::msg::String msg;
+    msg.data = payload;
+    json_publisher_->publish(msg);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
+  cali_complete = false;
+  while(cali_complete == false) {
+    RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
+    std::string payload = "{"Stage": "Calibration", "Type": "request", "Target": "Drivetrain", "Command": "Set_Axis_State", "Payload": {"1": "CLOSED_LOOP_CONTROL", "2": "CLOSED_LOOP_CONTROL", "3": "CLOSED_LOOP_CONTROL", "4": "CLOSED_LOOP_CONTROL", "5": "CLOSED_LOOP_CONTROL", "6": "CLOSED_LOOP_CONTROL"}}"
+    std_msgs::msg::String msg;
+    msg.data = payload;
+    json_publisher_->publish(msg);
+    std::this_thread::sleep_for(std::chrono::seconds(1));
+  }
+  cali_complete = false;
+  while(cali_complete == false) {
+    RCLCPP_INFO(this->get_logger(), "Msg Response: %s", msg.data.c_str());
+    std::string payload = "{"Stage": "Calibration", "Type": "request", "Target": "Drivetrain", "Command": "Set_Controller_Mode", "Payload": {"1": {"control_mode": "VELOCITY_CONTROL", "input_mode": "VEL_RAMP"}, "2": {"control_mode": "VELOCITY_CONTROL", "input_mode": "VEL_RAMP"}, "3": {"control_mode": "VELOCITY_CONTROL", "input_mode": "VEL_RAMP"}, "4": {"control_mode": "VELOCITY_CONTROL", "input_mode": "VEL_RAMP"}, "5": {"control_mode": "VELOCITY_CONTROL", "input_mode": "VEL_RAMP"}, "6": {"control_mode": "VELOCITY_CONTROL", "input_mode": "VEL_RAMP"}}}"
+    std_msgs::msg::String msg;
+    msg.data = payload;
     json_publisher_->publish(msg);
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
@@ -71,12 +65,6 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
   if (json_publisher_) {
     json_publisher_->on_deactivate();
   }
-  motor_cmd_ = this->create_publisher<uwrt_ros_msg::msg::OdriveCmd>("OdriveCmd", 10);
-  cmd_response_ = this->create_subscription<uwrt_ros_msg::msg::MsgResponse>(
-    "MsgResponse", 10, std::bind(&StateMachine::response_callback, this, std::placeholders::_1));
-  joint_state_subscriber_ = this->create_subscription<sensor_msgs::msg::JointState>(
-    "joint_states",
-    10, std::bind(&StateMachine::joint_state_callback, this, std::placeholders::_1));
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
 
@@ -84,8 +72,8 @@ StateMachine::on_configure(const rclcpp_lifecycle::State &) {
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
 StateMachine::on_activate(const rclcpp_lifecycle::State &) {
   RCLCPP_INFO(get_logger(), "on_activate() is called.");
-  if (motor_cmd_) {
-    motor_cmd_->on_activate();
+  if (json_publisher_) {
+    json_publisher_->on_activate();
   }
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
@@ -94,8 +82,8 @@ StateMachine::on_activate(const rclcpp_lifecycle::State &) {
 rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn
 StateMachine::on_deactivate(const rclcpp_lifecycle::State &) {
   RCLCPP_INFO(get_logger(), "on_deactivate() is called.");
-  if (motor_cmd_) {
-    motor_cmd_->on_deactivate();
+  if (json_publisher_) {
+    json_publisher_->on_deactivate();
   }
   return rclcpp_lifecycle::node_interfaces::LifecycleNodeInterface::CallbackReturn::SUCCESS;
 }
